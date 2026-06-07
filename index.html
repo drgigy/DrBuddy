@@ -54,7 +54,7 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
   position:fixed;bottom:0;left:0;right:0;z-index:200;
   background:white;
   border-top:1.5px solid var(--border);
-  display:grid;grid-template-columns:repeat(4,1fr);
+  display:grid;grid-template-columns:repeat(3,1fr);
   height:60px;padding-bottom:env(safe-area-inset-bottom);
   box-shadow:0 -2px 8px rgba(0,0,0,.06);
 }
@@ -69,8 +69,8 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 /* ═══════════════════════════════════════
    SCREEN 1 — DICTATE
 ═══════════════════════════════════════ */
-#s-dictate{background:var(--surface);overflow-y:auto;-webkit-overflow-scrolling:touch;}
-.dictate-shell{padding:12px 14px 28px;display:flex;flex-direction:column;gap:10px;}
+#s-dictate{background:var(--surface);display:flex;flex-direction:column;overflow:hidden;}
+.dictate-shell{flex-shrink:0;padding:10px 14px 0;display:flex;flex-direction:column;gap:8px;max-height:60vh;}
 
 /* Patient row */
 .pat-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:stretch;}
@@ -158,7 +158,7 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 }
 
 /* Action row — save etc */
-.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.action-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 .action-btn{
   height:44px;border-radius:11px;border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:7px;
@@ -449,6 +449,33 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
   font-size:20px;font-weight:500;color:var(--ink);
 }
 
+
+/* ── DICTATE SCREEN LAYOUT ── */
+.dictate-sections-scroll{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:8px 14px 12px;
+  min-height:80px;
+}
+.dictate-sections-scroll::-webkit-scrollbar{width:3px;}
+
+.dictate-action-bar{
+  flex-shrink:0;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+  background:white;border-top:1.5px solid var(--border);
+  box-shadow:0 -2px 8px rgba(0,0,0,.06);
+}
+.dab-btn{
+  height:44px;border-radius:11px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;
+  transition:all .15s;-webkit-tap-highlight-color:transparent;
+}
+.dab-btn:active{transform:scale(.96);}
+.dab-save{background:var(--blue);color:white;}
+.dab-clear{background:#fef2f2;color:#b91c1c;border:1.5px solid #fca5a5;}
+.dab-wa{background:#25d366;color:white;}
+
 /* Toast */
 .toast{
   position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -590,29 +617,30 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 
 <!-- ═══ SCREEN 1: DICTATE ═══ -->
 <div class="screen active" id="s-dictate">
-<div class="dictate-shell">
 
-  <!-- Patient Fields -->
-  <div class="pat-row">
-    <div class="pat-field">
-      <label>Patient Name</label>
-      <input id="patName" placeholder="e.g. John Abraham" oninput="updateHeader()">
-    </div>
-    <div class="pat-field-sm">
-      <label>UHID</label>
-      <input id="patMrd" placeholder="UHID">
-    </div>
-    <div class="pat-field-sm" onclick="openAgeSexPicker()" style="cursor:pointer;">
-      <label>Age/Sex</label>
-      <div id="ageSexDisplay" style="font-size:14px;font-weight:500;color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
-        <span id="ageSexText">Select</span>
-        <span style="color:var(--ink3);font-size:16px;line-height:1;">›</span>
+  <!-- FIXED TOP: patient + dictate controls -->
+  <div class="dictate-shell">
+
+    <!-- Patient Fields -->
+    <div class="pat-row">
+      <div class="pat-field">
+        <label>Patient Name</label>
+        <input id="patName" placeholder="e.g. John Abraham" oninput="updateHeader()">
+      </div>
+      <div class="pat-field-sm">
+        <label>UHID</label>
+        <input id="patMrd" placeholder="UHID">
+      </div>
+      <div class="pat-field-sm" onclick="openAgeSexPicker()" style="cursor:pointer;">
+        <label>Age/Sex</label>
+        <div style="font-size:14px;font-weight:500;color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+          <span id="ageSexText">Select</span>
+          <span style="color:var(--ink3);font-size:16px;line-height:1;">›</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- BIG DICTATE BUTTON -->
-  <div class="big-dict-wrap">
+    <!-- BIG DICTATE BUTTON -->
     <button class="big-dict-btn" id="bigDictBtn" onclick="handleDictClick()">
       <div class="dict-icon" id="dictIcon">🎙</div>
       <div class="dict-text-wrap">
@@ -628,50 +656,44 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
       </div>
     </button>
 
-    <!-- Pause / Stop (hidden until recording) -->
+    <!-- Pause / Stop — visible when recording -->
     <div class="ctrl-row" id="ctrlRow" style="display:none;">
       <button class="ctrl-btn pause-btn" id="pauseBtn" onclick="togglePause()">
         <span id="pauseIcon">⏸</span> <span id="pauseLabel">Pause</span>
       </button>
       <button class="ctrl-btn stop-btn" onclick="stopAndProcess()">
-        ⏹ Stop &amp; Save
+        ⏹ Stop &amp; Process
       </button>
     </div>
+
+    <!-- Timer + Progress -->
+    <div class="timer-row">
+      <div class="timer-display" id="timerDisplay">00:00</div>
+      <div class="timer-status" id="timerStatus">Ready</div>
+    </div>
+    <div class="prog-row">
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      <span class="prog-pct" id="progPct">0%</span>
+    </div>
+
+    <!-- Transcript preview (hidden until dictation) -->
+    <div class="transcript-box" id="transcriptPreview"></div>
+
   </div>
 
-  <!-- Timer + status -->
-  <div class="timer-row">
-    <div class="timer-display" id="timerDisplay">00:00</div>
-    <div class="timer-status" id="timerStatus">Ready</div>
+  <!-- SCROLLABLE: note sections -->
+  <div class="dictate-sections-scroll">
+    <div class="inline-secs-label">Visit Note — tap 🎤 to dictate a section</div>
+    <div id="inlineSections"></div>
   </div>
 
-  <!-- Progress -->
-  <div class="prog-row">
-    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
-    <span class="prog-pct" id="progPct">0%</span>
+  <!-- FIXED BOTTOM: action bar -->
+  <div class="dictate-action-bar">
+    <button class="dab-btn dab-save" onclick="saveNote()">💾 Save</button>
+    <button class="dab-btn dab-clear" onclick="clearAll()">🗑 Clear</button>
+    <button class="dab-btn dab-wa" onclick="waNote()">💬 WA</button>
   </div>
 
-  <!-- Live transcript preview -->
-  <div class="transcript-box" id="transcriptPreview"></div>
-
-  <!-- Save / Clear -->
-  <div class="action-row">
-    <button class="action-btn save" onclick="saveNote()">💾 Save Note</button>
-    <button class="action-btn clear" onclick="clearAll()">🗑 Clear</button>
-  </div>
-
-  <!-- Inline editable note sections -->
-  <div class="inline-secs-label">Visit Note — tap 🎤 to dictate a section</div>
-  <div id="inlineSections"></div>
-
-  <!-- Export row -->
-  <div class="action-row" style="margin-top:4px;">
-    <button class="action-btn save" onclick="saveNote()">💾 Save</button>
-    <button class="action-btn" style="background:#fef2f2;color:#9b2226;border:1.5px solid #fca5a5;" onclick="clearAll()">🗑 Clear</button>
-    <button class="action-btn" style="background:rgba(26,107,181,.10);color:var(--blue);border:1.5px solid rgba(26,107,181,.25);" onclick="waNote()">💬 WA</button>
-  </div>
-
-</div>
 </div>
 
 <!-- ═══ SCREEN 2: NOTE SECTIONS ═══ -->
@@ -687,29 +709,6 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
   <div class="secs-scroll" id="sectionsList"></div>
 </div>
 
-<!-- ═══ SCREEN 3: NOTE PREVIEW ═══ -->
-<div class="screen" id="s-preview">
-  <div class="prev-hdr">
-    <div class="prev-hdr-title">Preview</div>
-    <button class="prev-hdr-btn" onclick="printNote()">🖶 Print</button>
-  </div>
-  <div class="prev-scroll" id="prevScroll">
-    <div class="prev-empty" id="prevEmpty">
-      <div class="prev-empty-icon">📋</div>
-      <div style="font-size:13px;">Dictate something first</div>
-    </div>
-    <div id="prevContent" style="display:none;">
-      <div class="prev-patient" id="prevPatient"></div>
-      <div class="prev-meta" id="prevMeta"></div>
-      <div id="prevSections"></div>
-    </div>
-  </div>
-  <div class="export-bar">
-    <button class="exp-btn" onclick="copyNote()">📋 Copy</button>
-    <button class="exp-btn" onclick="saveToFiles()">📄 Files</button>
-    <button class="exp-btn wa" onclick="waNote()">💬 WA</button>
-  </div>
-</div>
 
 <!-- ═══ SCREEN 4: TRAINING ═══ -->
 <div class="screen" id="s-training">
@@ -789,13 +788,10 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
     <span class="bnav-label">Dictate</span>
   </button>
   <button class="bnav-item" id="nav-template" onclick="switchScreen('template')">
-    <span class="bnav-icon">✏️</span>
+    <span class="bnav-icon">📝</span>
     <span class="bnav-label">Template</span>
   </button>
-  <button class="bnav-item" id="nav-preview" onclick="switchScreen('preview')">
-    <span class="bnav-icon">📄</span>
-    <span class="bnav-label">Preview</span>
-  </button>
+
   <button class="bnav-item" id="nav-training" onclick="switchScreen('training')">
     <span class="bnav-icon">🧠</span>
     <span class="bnav-label">Training</span>
@@ -909,15 +905,12 @@ async function loadVocab(){
 // INIT
 // ═══════════════════════════════
 function init(){
-  applyCustomTemplate();
-  TEMPLATE.sections.forEach(s=>{ if(noteData[s.id]===undefined) noteData[s.id]=''; });
-  buildInlineSections();
+  applyCustomTemplate();  // sets TEMPLATE.sections, builds inline cards
   buildTeList();
   loadProfile();
   loadApiKeyStatus();
   loadVocab().then(renderVocabList);
   updateProgress();
-  checkNoteEmpty();
   updateHeader();
 }
 
@@ -930,7 +923,7 @@ function switchScreen(name){
   document.getElementById('s-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
   activeScreen = name;
-  if(name==='preview') renderPreview();
+
   if(name==='template') buildTeList();
 }
 
@@ -1138,8 +1131,6 @@ async function startFullDictation(){
     setDictUI('recording');
     startTimer();
     showToast('Dictating — speak your full visit note');
-    // switch to note screen so progress is visible
-    switchScreen('note');
   }catch(err){
     if(err.name==='NotAllowedError') showToast('Microphone blocked — please allow access');
     else showToast('Cannot start mic: '+err.message);
@@ -1263,10 +1254,12 @@ Do not invent information not present in the dictation.`},
         updateSectionStatus(s.id);
       }
     });
-    setTimeout(()=>{updateProgress();checkNoteEmpty();},TEMPLATE.sections.length*80+100);
+    setTimeout(()=>{
+      updateProgress();checkNoteEmpty();
+      fillInlineFromNoteData();
+    },TEMPLATE.sections.length*80+100);
     if(filled===0) showToast('AI found no matching sections — check transcript');
-    else showToast(filled+' section'+(filled===1?'':'s')+' filled ✓ — review and edit');
-    // Go back to dictate screen
+    else showToast(filled+' section'+(filled===1?'':'s')+' filled ✓ — review below');
     switchScreen('dictate');
   }catch(err){
     console.error('processFullDictation error:',err);
@@ -1383,9 +1376,7 @@ function updateSectionStatus(id){
   syncQuickList();
 }
 function checkNoteEmpty(){
-  const hasAny=TEMPLATE.sections.some(s=>noteData[s.id]&&noteData[s.id].trim());
-  document.getElementById('prevEmpty').style.display=hasAny?'none':'flex';
-  document.getElementById('prevContent').style.display=hasAny?'block':'none';
+  // Preview screen removed — nothing to update
 }
 function updateProgress(){
   const filled=TEMPLATE.sections.filter(s=>noteData[s.id]&&noteData[s.id].trim()).length;
@@ -1395,7 +1386,7 @@ function updateProgress(){
 }
 function updateHeader(){
   const n=document.getElementById('patName')?.value;
-  const a=document.getElementById('patAge')?.value;
+  const a=getAgeSex();
   document.getElementById('noteHdrTitle').textContent=n||'Visit Note';
   document.getElementById('noteHdrMeta').textContent=a?a+' · Tap section to dictate':'Tap a section to dictate';
 }
@@ -1403,22 +1394,6 @@ function updateHeader(){
 // ═══════════════════════════════
 // PREVIEW
 // ═══════════════════════════════
-function renderPreview(){
-  const n=document.getElementById('patName').value;
-  const m=document.getElementById('patMrd').value;
-  const a=document.getElementById('patAge').value;
-  const dateStr=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
-  document.getElementById('prevPatient').textContent=n||'Patient';
-  document.getElementById('prevMeta').textContent=[a,m?'UHID: '+m:'',dateStr,getDoctorName()].filter(Boolean).join(' · ');
-  const secs=document.getElementById('prevSections');
-  secs.innerHTML='';
-  TEMPLATE.sections.forEach(s=>{
-    if(noteData[s.id]&&noteData[s.id].trim()){
-      secs.innerHTML+=`<div class="prev-sec-title">${s.title}</div><div class="prev-sec-body">${noteData[s.id].trim()}</div>`;
-    }
-  });
-  checkNoteEmpty();
-}
 
 // ═══════════════════════════════
 // EXPORT
@@ -1426,7 +1401,7 @@ function renderPreview(){
 function copyNote(){
   const n=document.getElementById('patName').value;
   const m=document.getElementById('patMrd').value;
-  const a=document.getElementById('patAge').value;
+  const a=getAgeSex();
   let txt='VISIT NOTE\n';
   txt+='Patient: '+(n||'--')+' | UHID: '+(m||'--')+' | Age/Sex: '+(a||'--')+'\n';
   txt+='Date: '+new Date().toLocaleDateString('en-IN')+'\n';
@@ -1436,7 +1411,7 @@ function copyNote(){
 }
 function waNote(){
   const n=document.getElementById('patName').value;
-  const a=document.getElementById('patAge').value;
+  const a=getAgeSex();
   let txt='*Visit Note*\n'+getDoctorName()+'\nPatient: '+(n||'--')+' | Age: '+(a||'--')+'\n\n';
   TEMPLATE.sections.forEach(s=>{if(noteData[s.id]?.trim()) txt+='*'+s.title+'*\n'+noteData[s.id].trim()+'\n\n';});
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
@@ -1444,7 +1419,7 @@ function waNote(){
 function saveToFiles(){
   const n=document.getElementById('patName').value.trim();
   const m=document.getElementById('patMrd').value.trim();
-  const a=document.getElementById('patAge').value.trim();
+  const a=getAgeSex();
   const dateStr=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
   const timeStr=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
   let txt='VISIT NOTE\n'+'='.repeat(50)+'\n';
@@ -1461,7 +1436,7 @@ function saveToFiles(){
 function printNote(){
   const n=document.getElementById('patName').value;
   const m=document.getElementById('patMrd').value;
-  const a=document.getElementById('patAge').value;
+  const a=getAgeSex();
   let html='<html><head><title>Visit Note</title><style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;color:#111;line-height:1.7;}h1{font-size:22px;font-weight:400;margin-bottom:4px;}.meta{font-size:13px;color:#666;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid #ddd;}.st{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#2563a8;margin-bottom:6px;margin-top:20px;}.sb{font-size:14px;line-height:1.8;color:#374151;white-space:pre-line;}@media print{.no-print{display:none!important;}}</style></head><body>';
   html+='<div class="no-print"><button onclick="window.close()" style="padding:8px 16px;background:#1c2b3a;color:white;border:none;border-radius:7px;cursor:pointer;margin-bottom:20px;font-size:13px;">← Back</button></div>';
   html+='<h1>Visit Note</h1><div class="meta">'+n+' · '+a+' · UHID: '+m+'<br>'+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})+' · '+getDoctorName()+'</div>';
@@ -1478,7 +1453,7 @@ async function saveNote(){
   if(!hasContent){showToast('Nothing to save — dictate first');return;}
   const n=document.getElementById('patName').value.trim();
   const m=document.getElementById('patMrd').value.trim();
-  const a=document.getElementById('patAge').value.trim();
+  const a=getAgeSex();
   const note={id:currentNoteId||(currentNoteId='note_'+Date.now()),ts:Date.now(),template:'stroke',label:TEMPLATE.label,patient:n,mrd:m,age:a,sections:{...noteData}};
   await persistNote(note);
   showToast('Note saved ✓');
@@ -1505,7 +1480,7 @@ function clearAll(silent){
 }
 function newPatient(){
   if(!confirm('Start new patient? This will clear the current note.')) return;
-  ['patName','patMrd','patAge'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['patName','patMrd'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); pickerAge=45; pickerSex='M'; document.getElementById('ageSexText').textContent='Select';
   clearAll(true);
   timerSeconds=0;document.getElementById('timerDisplay').textContent='00:00';
   showToast('Ready for new patient');
@@ -1624,10 +1599,8 @@ function applyCustomTemplate(){
   TEMPLATE.sections = secs.filter(s=>s.enabled!==false);
   TEMPLATE.sections.forEach(s=>{ if(noteData[s.id]===undefined) noteData[s.id]=''; });
   buildInlineSections();
-  buildSections();
-  if(typeof buildQuickList === 'function') buildQuickList();
+  buildSections(); // keep s-note screen in sync (hidden but needed for section dictation)
   updateProgress();
-  checkNoteEmpty();
 }
 
 // Build the editor card list
@@ -1814,22 +1787,56 @@ function buildInlineSections(){
     const card = document.createElement('div');
     card.className = 'isec-card';
     card.id = 'isec-' + sec.id;
-    card.innerHTML =
-      '<div class="isec-head">' +
-        '<div class="isec-num" id="inum-'+sec.id+'">'+(i+1)+'</div>' +
-        '<div class="isec-title" id="itit-'+sec.id+'">'+sec.title+'</div>' +
-        '<div class="isec-rec" id="irec-'+sec.id+'"><div class="isec-rec-dot"></div>REC</div>' +
-        '<div class="isec-check" id="ichk-'+sec.id+'"></div>' +
-        '<button class="isec-mic" id="imic-'+sec.id+'" onclick="tapInlineMic(''+sec.id+'')" title="Dictate this section">🎤</button>' +
-      '</div>' +
-      '<div class="isec-body" id="ibody-'+sec.id+'" contenteditable="true" ' +
-        'data-ph="'+sec.hint+'" ' +
-        'oninput="onInlineEdit(''+sec.id+'')"></div>';
+
+    const head = document.createElement('div');
+    head.className = 'isec-head';
+
+    const num = document.createElement('div');
+    num.className = 'isec-num';
+    num.id = 'inum-' + sec.id;
+    num.textContent = i + 1;
+
+    const title = document.createElement('div');
+    title.className = 'isec-title';
+    title.id = 'itit-' + sec.id;
+    title.textContent = sec.title;
+
+    const rec = document.createElement('div');
+    rec.className = 'isec-rec';
+    rec.id = 'irec-' + sec.id;
+    rec.innerHTML = '<div class="isec-rec-dot"></div>REC';
+
+    const chk = document.createElement('div');
+    chk.className = 'isec-check';
+    chk.id = 'ichk-' + sec.id;
+
+    const mic = document.createElement('button');
+    mic.className = 'isec-mic';
+    mic.id = 'imic-' + sec.id;
+    mic.title = 'Dictate this section';
+    mic.textContent = '🎤';
+    mic.addEventListener('click', function(){ tapInlineMic(sec.id); });
+
+    head.appendChild(num);
+    head.appendChild(title);
+    head.appendChild(rec);
+    head.appendChild(chk);
+    head.appendChild(mic);
+
+    const body = document.createElement('div');
+    body.className = 'isec-body';
+    body.id = 'ibody-' + sec.id;
+    body.contentEditable = 'true';
+    body.dataset.ph = sec.hint;
+    body.addEventListener('input', function(){ onInlineEdit(sec.id); });
+
+    card.appendChild(head);
+    card.appendChild(body);
     container.appendChild(card);
-    // restore any existing data
+
+    // Restore saved data
     if(noteData[sec.id]){
-      const body = card.querySelector('.isec-body');
-      if(body) body.textContent = noteData[sec.id];
+      body.textContent = noteData[sec.id];
       syncInlineSectionStatus(sec.id);
     }
   });
