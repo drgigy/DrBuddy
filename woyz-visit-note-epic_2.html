@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>WOYZ Visit Note</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #1a2e44;
+  --navy2:  #15273a;
+  --navy3:  #0f1e2e;
+  --blue:   #1a6bb5;
+  --blue2:  #2480d6;
+  --glow:   #3b9edd;
+  --gold:   #c8a951;
+  --red:    #c0392b;
+  --green:  #16a34a;
+  --cream:  #f0f4f8;
+  --ink:    #1a2e44;
+  --ink2:   #2d4a62;
+  --ink3:   #5a7a94;
+  --border: #c8d8e6;
+  --surface:#f0f4f8;
+  --r: 14px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;background:var(--surface);color:var(--ink);}
+
+/* ── HEADER ── */
+.hdr{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--navy);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;height:52px;
+}
+.logo{display:flex;align-items:center;gap:8px;}
+.logo-mark{width:26px;height:26px;background:linear-gradient(135deg,var(--gold),#f0c855);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.logo-text{font-family:'IBM Plex Sans',sans-serif;font-size:17px;font-weight:600;color:white;letter-spacing:-.02em;}
+.logo-text em{color:var(--gold);font-style:normal;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.hdr-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.10);border-radius:8px;padding:6px 10px;color:rgba(255,255,255,0.70);font-size:12px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;}
+
+/* ── SCREEN SYSTEM ── */
+.screen{position:fixed;top:52px;bottom:0;left:0;right:0;display:none;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;}
+
+/* ── BOTTOM NAV ── */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:white;
+  border-top:1.5px solid var(--border);
+  display:grid;grid-template-columns:repeat(4,1fr);
+  height:60px;padding-bottom:env(safe-area-inset-bottom);
+  box-shadow:0 -2px 8px rgba(0,0,0,.06);
+}
+.bnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:all .15s;border:none;background:none;color:#a0b4c4;font-family:'IBM Plex Sans',sans-serif;}
+.bnav-item.active{color:var(--blue);}
+.bnav-icon{font-size:20px;line-height:1;}
+.bnav-label{font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+
+/* ── SCREENS BOTTOM OFFSET ── */
+.screen{bottom:60px;}
+
+/* ═══════════════════════════════════════
+   SCREEN 1 — DICTATE
+═══════════════════════════════════════ */
+#s-dictate{background:var(--surface);overflow-y:auto;}
+.dictate-shell{padding:16px 16px 24px;display:flex;flex-direction:column;gap:14px;}
+
+/* Patient row */
+.pat-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:stretch;}
+.pat-field{background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.pat-field:focus-within{border-color:var(--blue);}
+.pat-field label{font-size:9px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--ink3);}
+.pat-field input{background:none;border:none;outline:none;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:500;color:var(--ink);}
+.pat-field input::placeholder{color:#b0c4d4;}
+.pat-field-sm{background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 10px;display:flex;flex-direction:column;gap:2px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.pat-field-sm:focus-within{border-color:var(--blue);}
+.pat-field-sm label{font-size:9px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--ink3);}
+.pat-field-sm input{background:none;border:none;outline:none;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink);width:60px;}
+.pat-field-sm input::placeholder{color:#b0c4d4;}
+
+/* THE BIG DICTATE BUTTON */
+.big-dict-wrap{display:flex;flex-direction:column;gap:10px;}
+.big-dict-btn{
+  width:100%;height:80px;border:none;border-radius:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:20px;font-weight:700;color:white;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  box-shadow:0 6px 24px rgba(37,99,168,.40);
+  transition:all .2s;user-select:none;-webkit-user-select:none;
+  position:relative;overflow:hidden;
+}
+.big-dict-btn:active{transform:scale(.97);}
+.big-dict-btn.recording{
+  background:linear-gradient(135deg,#991b1b,var(--red));
+  box-shadow:0 6px 28px rgba(220,38,38,.50);
+  animation:pulse-rec 1.4s ease-in-out infinite;
+}
+.big-dict-btn.paused{
+  background:linear-gradient(135deg,#78530e,var(--gold));
+  box-shadow:0 6px 24px rgba(212,168,71,.40);
+}
+@keyframes pulse-rec{0%,100%{box-shadow:0 6px 24px rgba(220,38,38,.45);}50%{box-shadow:0 6px 40px rgba(220,38,38,.80);}}
+.dict-icon{font-size:30px;line-height:1;flex-shrink:0;}
+.dict-text-wrap{display:flex;flex-direction:column;align-items:flex-start;}
+.dict-label{font-size:18px;font-weight:700;line-height:1.1;}
+.dict-sublabel{font-size:11.5px;font-weight:500;opacity:.70;margin-top:2px;}
+
+/* Waveform inside button */
+.dict-wave{display:flex;align-items:center;gap:2px;height:24px;opacity:0;position:absolute;right:18px;top:50%;transform:translateY(-50%);transition:opacity .3s;}
+.dict-wave.on{opacity:1;}
+.wb{width:3px;background:rgba(255,255,255,.80);border-radius:2px;animation:wv .8s ease-in-out infinite;}
+@keyframes wv{0%,100%{height:4px;}50%{height:18px;}}
+
+/* Pause / Resume / Stop row */
+.ctrl-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ctrl-btn{
+  height:52px;border-radius:12px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;
+  transition:all .15s;
+}
+.ctrl-btn.pause-btn{background:#fef3c7;color:#b45309;border:1.5px solid #fcd34d;}
+.ctrl-btn.stop-btn{background:#fef2f2;color:#b91c1c;border:1.5px solid #fca5a5;}
+.ctrl-btn:active{transform:scale(.96);}
+
+/* Timer */
+.timer-row{display:flex;align-items:center;justify-content:space-between;}
+.timer-display{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:var(--ink3);}
+.timer-status{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;}
+.timer-status.rec{color:var(--red);}
+.timer-status.paused{color:#b45309;}
+
+/* Progress */
+.prog-row{display:flex;align-items:center;gap:10px;}
+.prog-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(to right,var(--blue),var(--glow));border-radius:2px;width:0%;transition:width .4s;}
+.prog-pct{font-size:12px;font-weight:700;color:var(--gold);min-width:30px;text-align:right;}
+
+/* Transcript preview */
+.transcript-box{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:12px;padding:12px 14px;
+  font-size:13px;color:var(--ink2);line-height:1.7;
+  min-height:56px;display:none;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.transcript-box.show{display:block;}
+.transcript-box::before{
+  content:'▶ ';color:var(--blue);font-size:10px;vertical-align:middle;
+}
+
+/* Action row — save etc */
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.action-btn{
+  height:44px;border-radius:11px;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;font-weight:600;
+  transition:all .15s;
+}
+.action-btn.save{background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;}
+.action-btn.clear{background:#fef2f2;color:#b91c1c;border:1.5px solid #fca5a5;}
+.action-btn:active{transform:scale(.96);}
+
+/* ═══════════════════════════════════════
+   SCREEN 2 — NOTE SECTIONS
+═══════════════════════════════════════ */
+#s-note{background:var(--surface);}
+.note-hdr{
+  flex-shrink:0;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.10);
+  padding:14px 16px 10px;
+}
+.note-hdr-title{font-family:'IBM Plex Sans',sans-serif;font-size:17px;font-weight:600;color:white;}
+.note-hdr-meta{font-size:11.5px;color:rgba(255,255,255,.52);margin-top:2px;}
+.hint-strip{
+  flex-shrink:0;background:#e8f0f8;border-bottom:1.5px solid var(--border);
+  padding:9px 16px;display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--ink2);
+}
+.hint-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-g 2s infinite;}
+@keyframes pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.4);}50%{box-shadow:0 0 0 5px rgba(22,163,74,0);}}
+
+.secs-scroll{flex:1;overflow-y:auto;padding:10px 12px 20px;}
+.secs-scroll::-webkit-scrollbar{width:3px;}
+.sec-card{
+  background:white;border:1.5px solid var(--border);border-radius:14px;
+  margin-bottom:10px;overflow:hidden;transition:all .18s;
+}
+.sec-card.active{border-color:var(--blue);box-shadow:0 2px 16px rgba(37,99,168,.14);}
+.sec-card.filled{border-color:rgba(22,163,74,.30);}
+.sec-card-head{
+  display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+}
+.sec-num{width:26px;height:26px;border-radius:50%;background:var(--navy);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.sec-card.active .sec-num{background:var(--blue);}
+.sec-card.filled .sec-num{background:var(--green);}
+.sec-card.active.filled .sec-num{background:var(--blue);}
+.sec-card-info{flex:1;min-width:0;}
+.sec-card-title{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--ink);}
+.sec-card.active .sec-card-title{color:var(--blue);}
+.sec-card.filled .sec-card-title{color:var(--green);}
+.sec-card.active.filled .sec-card-title{color:var(--blue);}
+.sec-card-hint{font-size:11.5px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sec-status{font-size:16px;flex-shrink:0;}
+.rec-badge{display:none;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--red);background:rgba(220,38,38,.08);border-radius:20px;padding:2px 7px;flex-shrink:0;}
+.rec-badge.show{display:flex;}
+.rec-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+.sec-body-wrap{display:none;padding:0 14px 14px;}
+.sec-body-wrap.open{display:block;}
+.sec-body{
+  font-size:14px;line-height:1.8;color:var(--ink2);
+  outline:none;min-height:32px;border-radius:6px;padding:4px 6px;
+  transition:background .15s;cursor:text;white-space:pre-wrap;
+  border:1px solid transparent;
+}
+.sec-body:focus{background:rgba(37,99,168,.04);border-color:rgba(37,99,168,.15);}
+.sec-body:empty::before{content:attr(data-placeholder);color:rgba(0,0,0,.20);font-style:italic;pointer-events:none;}
+.sec-body.dictating::after{content:'|';color:var(--blue);animation:cursor-blink .7s step-end infinite;font-weight:300;}
+@keyframes cursor-blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.sec-body.just-filled{animation:pop-in .5s ease both;}
+@keyframes pop-in{from{opacity:0;transform:translateY(3px);background:rgba(37,99,168,.08);}to{opacity:1;transform:none;background:transparent;}}
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — NOTE PREVIEW
+═══════════════════════════════════════ */
+#s-preview{background:white;}
+.prev-hdr{flex-shrink:0;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.10);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;}
+.prev-hdr-title{font-family:'IBM Plex Sans',sans-serif;font-size:18px;font-weight:600;color:white;}
+.prev-hdr-btn{padding:7px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.20);background:rgba(255,255,255,.12);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;color:white;cursor:pointer;}
+.prev-scroll{flex:1;overflow-y:auto;padding:20px 18px 24px;}
+.prev-patient{font-family:'IBM Plex Sans',sans-serif;font-size:21px;font-weight:600;color:var(--ink);margin-bottom:3px;}
+.prev-meta{font-size:12px;color:var(--ink3);margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.prev-sec-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;display:flex;align-items:center;gap:8px;margin-top:20px;}
+.prev-sec-title::after{content:'';flex:1;height:1px;background:rgba(37,99,168,.12);}
+.prev-sec-body{font-size:14.5px;line-height:1.85;color:var(--ink2);white-space:pre-wrap;}
+.prev-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60%;color:var(--ink3);gap:10px;text-align:center;}
+.prev-empty-icon{font-size:36px;opacity:.20;}
+.export-bar{flex-shrink:0;display:flex;gap:8px;padding:10px 16px;background:white;border-top:1.5px solid var(--border);}
+.exp-btn{flex:1;height:42px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+.exp-btn.wa{background:#25d366;color:white;border-color:#22c45e;}
+.exp-btn:active{transform:scale(.96);}
+
+/* ═══════════════════════════════════════
+   SCREEN 4 — TRAINING
+═══════════════════════════════════════ */
+#s-training{background:var(--surface);}
+.train-scroll{flex:1;overflow-y:auto;padding:16px;}
+.train-head{font-family:'IBM Plex Sans',sans-serif;font-size:20px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.train-sub{font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:18px;}
+.train-label{font-size:10px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;}
+.train-add-row{display:flex;gap:8px;margin-bottom:12px;}
+.train-input{flex:1;background:white;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;}
+.train-input::placeholder{color:#b0c4d4;}
+.train-add-btn{padding:0 16px;background:var(--blue);color:white;border:none;border-radius:10px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.vocab-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:white;border:1.5px solid var(--border);border-radius:10px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.vocab-word{font-size:13.5px;color:var(--ink);font-weight:500;}
+.vocab-del{background:none;border:none;color:#f87171;cursor:pointer;font-size:15px;padding:2px 6px;}
+
+/* Settings panel */
+.train-settings-section{background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-top:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.sett-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.sett-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);}
+.sett-input{background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;width:100%;}
+.sett-input::placeholder{color:#b0c4d4;}
+.sett-save{width:100%;padding:12px;background:var(--blue);color:white;border:none;border-radius:10px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;}
+.sett-status{font-size:12px;color:#15803d;margin-top:6px;min-height:18px;}
+.api-row{display:flex;gap:6px;}
+.api-eye{padding:0 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--ink3);cursor:pointer;font-size:16px;}
+
+/* ═══════════════════════════════════════
+   OVERLAYS
+═══════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(26,46,68,.70);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px;}
+.overlay.show{display:flex;}
+.ov-card{background:white;border:1px solid var(--border);border-radius:20px;padding:32px 28px;text-align:center;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(26,46,68,.20);}
+.ov-spinner{width:44px;height:44px;border-radius:50%;border:3px solid rgba(37,99,168,.20);border-top-color:var(--blue);animation:spin .8s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ov-title{font-family:'IBM Plex Sans',sans-serif;font-size:19px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.ov-sub{font-size:12.5px;color:var(--ink3);line-height:1.6;}
+.ov-step{margin-top:14px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);}
+
+/* ── QUICK SECTION LIST (Dictate screen) ── */
+.ql-wrap{background:white;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.ql-label{font-size:9.5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--ink3);padding:10px 14px 8px;border-bottom:1px solid var(--border);background:var(--surface);}
+.ql-list{display:flex;flex-direction:column;}
+.ql-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .12s;
+  user-select:none;-webkit-user-select:none;
+}
+.ql-item:last-child{border-bottom:none;}
+.ql-item:active{background:rgba(26,107,181,.06);}
+.ql-item.ql-filled{background:#f0fdf4;}
+.ql-item.ql-active{background:rgba(26,107,181,.06);}
+.ql-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--navy);color:white;
+  font-size:9.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background .15s;
+}
+.ql-item.ql-filled .ql-num{background:var(--green);}
+.ql-item.ql-active .ql-num{background:var(--blue);}
+.ql-title{
+  flex:1;font-size:13px;font-weight:600;
+  color:var(--ink);letter-spacing:.01em;
+}
+.ql-item.ql-filled .ql-title{color:var(--green);}
+.ql-item.ql-active .ql-title{color:var(--blue);}
+.ql-check{font-size:14px;flex-shrink:0;}
+.ql-rec{
+  display:none;align-items:center;gap:3px;
+  font-size:9px;font-weight:700;color:var(--red);
+  background:rgba(192,57,43,.08);border-radius:20px;padding:2px 7px;
+  flex-shrink:0;
+}
+.ql-rec.show{display:flex;}
+.ql-rec-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1s ease-in-out infinite;}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--navy);color:white;
+  padding:10px 18px;border-radius:20px;font-size:13px;font-weight:500;
+  z-index:900;opacity:0;transition:all .3s;white-space:nowrap;
+  border:1px solid rgba(255,255,255,.10);
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-mark">W</div>
+    <div class="logo-text">WO<em>YZ</em></div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="newPatient()">＋ New</button>
+    <button class="hdr-btn" onclick="openSettings()">⚙</button>
+  </div>
+</header>
+
+<!-- ═══ SCREEN 1: DICTATE ═══ -->
+<div class="screen active" id="s-dictate">
+<div class="dictate-shell">
+
+  <!-- Patient Fields -->
+  <div class="pat-row">
+    <div class="pat-field">
+      <label>Patient Name</label>
+      <input id="patName" placeholder="e.g. John Abraham" oninput="updateHeader()">
+    </div>
+    <div class="pat-field-sm">
+      <label>UHID</label>
+      <input id="patMrd" placeholder="UHID">
+    </div>
+    <div class="pat-field-sm">
+      <label>Age/Sex</label>
+      <input id="patAge" placeholder="62 M">
+    </div>
+  </div>
+
+  <!-- BIG DICTATE BUTTON -->
+  <div class="big-dict-wrap">
+    <button class="big-dict-btn" id="bigDictBtn" onclick="handleDictClick()">
+      <div class="dict-icon" id="dictIcon">🎙</div>
+      <div class="dict-text-wrap">
+        <div class="dict-label" id="dictLabel">Dictate Now</div>
+        <div class="dict-sublabel" id="dictSubLabel">Tap to start full note</div>
+      </div>
+      <div class="dict-wave" id="dictWave">
+        <div class="wb" style="animation-delay:0s"></div>
+        <div class="wb" style="animation-delay:.12s"></div>
+        <div class="wb" style="animation-delay:.24s"></div>
+        <div class="wb" style="animation-delay:.36s"></div>
+        <div class="wb" style="animation-delay:.48s"></div>
+      </div>
+    </button>
+
+    <!-- Pause / Stop (hidden until recording) -->
+    <div class="ctrl-row" id="ctrlRow" style="display:none;">
+      <button class="ctrl-btn pause-btn" id="pauseBtn" onclick="togglePause()">
+        <span id="pauseIcon">⏸</span> <span id="pauseLabel">Pause</span>
+      </button>
+      <button class="ctrl-btn stop-btn" onclick="stopAndProcess()">
+        ⏹ Stop &amp; Save
+      </button>
+    </div>
+  </div>
+
+  <!-- Timer + status -->
+  <div class="timer-row">
+    <div class="timer-display" id="timerDisplay">00:00</div>
+    <div class="timer-status" id="timerStatus">Ready</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog-row">
+    <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+    <span class="prog-pct" id="progPct">0%</span>
+  </div>
+
+  <!-- Live transcript preview -->
+  <div class="transcript-box" id="transcriptPreview"></div>
+
+  <!-- Save / Clear -->
+  <div class="action-row">
+    <button class="action-btn save" onclick="saveNote()">💾 Save Note</button>
+    <button class="action-btn clear" onclick="clearAll()">🗑 Clear</button>
+  </div>
+
+  <!-- Section quick list -->
+  <div class="ql-wrap">
+    <div class="ql-label">Visit Note — tap section to dictate</div>
+    <div class="ql-list" id="quickList"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══ SCREEN 2: NOTE SECTIONS ═══ -->
+<div class="screen" id="s-note">
+  <div class="note-hdr">
+    <div class="note-hdr-title" id="noteHdrTitle">Visit Note</div>
+    <div class="note-hdr-meta" id="noteHdrMeta">Tap a section to dictate or edit</div>
+  </div>
+  <div class="hint-strip">
+    <div class="hint-dot" id="hintDot"></div>
+    <span id="hintText">Tap a section to dictate into it</span>
+  </div>
+  <div class="secs-scroll" id="sectionsList"></div>
+</div>
+
+<!-- ═══ SCREEN 3: NOTE PREVIEW ═══ -->
+<div class="screen" id="s-preview">
+  <div class="prev-hdr">
+    <div class="prev-hdr-title">Preview</div>
+    <button class="prev-hdr-btn" onclick="printNote()">🖶 Print</button>
+  </div>
+  <div class="prev-scroll" id="prevScroll">
+    <div class="prev-empty" id="prevEmpty">
+      <div class="prev-empty-icon">📋</div>
+      <div style="font-size:13px;">Dictate something first</div>
+    </div>
+    <div id="prevContent" style="display:none;">
+      <div class="prev-patient" id="prevPatient"></div>
+      <div class="prev-meta" id="prevMeta"></div>
+      <div id="prevSections"></div>
+    </div>
+  </div>
+  <div class="export-bar">
+    <button class="exp-btn" onclick="copyNote()">📋 Copy</button>
+    <button class="exp-btn" onclick="saveToFiles()">📄 Files</button>
+    <button class="exp-btn wa" onclick="waNote()">💬 WA</button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4: TRAINING ═══ -->
+<div class="screen" id="s-training">
+<div class="train-scroll">
+
+  <div class="train-head">Training</div>
+  <div class="train-sub">Add medical terms, drug names, or phrases. WOYZ will recognise them accurately during dictation.</div>
+
+  <div class="train-label">Add Custom Word / Phrase</div>
+  <div class="train-add-row">
+    <input class="train-input" id="vocabInput" placeholder="e.g. Apixaban 5 mg">
+    <button class="train-add-btn" onclick="addVocab()">Add</button>
+  </div>
+  <div id="vocabList"></div>
+
+  <!-- Settings embedded here -->
+  <div class="train-settings-section">
+    <div class="train-label">Doctor Profile</div>
+    <div class="sett-row">
+      <input class="sett-input" id="doctorName" placeholder="Dr. Gigy Kuruttukulam MD, DM">
+      <input class="sett-input" id="doctorDept" placeholder="Neurology / Neurosciences">
+      <button class="sett-save" onclick="saveProfile()">Save Profile</button>
+      <div class="sett-status" id="profileStatus"></div>
+    </div>
+
+    <div class="train-label" style="margin-top:4px;">API Key</div>
+    <div class="sett-row">
+      <div class="api-row">
+        <input class="sett-input" id="apiKeyInput" type="password" placeholder="Paste your key here" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="sett-status" id="apiStatus"></div>
+      <div style="display:flex;gap:8px;">
+        <button class="sett-save" onclick="saveApiKey()" style="flex:1;">Save Key</button>
+        <button class="sett-save" onclick="clearApiKey()" style="flex:0 0 auto;background:rgba(220,38,38,.20);padding:12px 16px;">Clear</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bnav-item active" id="nav-dictate" onclick="switchScreen('dictate')">
+    <span class="bnav-icon">🎙</span>
+    <span class="bnav-label">Dictate</span>
+  </button>
+  <button class="bnav-item" id="nav-note" onclick="switchScreen('note')">
+    <span class="bnav-icon">📋</span>
+    <span class="bnav-label">Sections</span>
+  </button>
+  <button class="bnav-item" id="nav-preview" onclick="switchScreen('preview')">
+    <span class="bnav-icon">📄</span>
+    <span class="bnav-label">Preview</span>
+  </button>
+  <button class="bnav-item" id="nav-training" onclick="switchScreen('training')">
+    <span class="bnav-icon">🧠</span>
+    <span class="bnav-label">Training</span>
+  </button>
+</nav>
+
+<!-- AI Processing Overlay -->
+<div class="overlay" id="aiOverlay">
+  <div class="ov-card">
+    <div class="ov-spinner"></div>
+    <div class="ov-title">Processing dictation</div>
+    <div class="ov-sub">Transcribing and structuring your note into clinical sections.</div>
+    <div class="ov-step" id="aiStep">Transcribing audio...</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════
+// TEMPLATE — Visit Note Only
+// ═══════════════════════════════
+const TEMPLATE = {
+  label: 'Neurology',
+  title: 'Stroke / Neurology OPD Note',
+  sections: [
+    {id:'cc',     title:'Chief Complaint',            hint:'Presenting complaint and onset...'},
+    {id:'hpi',    title:'History of Present Illness', hint:'Duration, progression, risk factors...'},
+    {id:'pmh',    title:'Past Medical / Surgical Hx', hint:'Hypertension, DM, prior strokes...'},
+    {id:'allergy',title:'Allergies',                  hint:'Drug allergies, contrast, NKDA...'},
+    {id:'meds',   title:'Current Medications',        hint:'Name, dose, frequency...'},
+    {id:'exam',   title:'Neurological Examination',   hint:'GCS, cranial nerves, motor, NIHSS...'},
+    {id:'inv',    title:'Investigations',             hint:'MRI, CT angio, bloods, INR...'},
+    {id:'imp',    title:'Impression / Diagnosis',     hint:'Final diagnosis...'},
+    {id:'rx',     title:'Prescription',               hint:'Medications on numbered lines...'},
+    {id:'plan',   title:'Management Plan',            hint:'Advice, procedures, follow-up, referral...'},
+  ]
+};
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let noteData = {};
+let activeSectionId = null;
+let singleRecording = false;
+let singlePaused = false;
+let singleMediaRecorder = null;
+let sharedMicStream = null;
+let singleAudioChunks = [];
+let timerInterval = null;
+let timerSeconds = 0;
+let currentNoteId = null;
+let activeScreen = 'dictate';
+
+let corrections = {
+  'aspirin 75 mg':'Aspirin 75 mg','clopidogrel 75 mg':'Clopidogrel 75 mg',
+  'atorvastatin 40 mg':'Atorvastatin 40 mg','apixaban 5 mg':'Apixaban 5 mg',
+  'warfarin':'Warfarin','amlodipine 5 mg':'Amlodipine 5 mg',
+  'nihss':'NIHSS','mrs':'mRS','tpa':'tPA','hba1c':'HbA1c',
+  'gcs':'GCS','umnf':'UMNF','ct brain':'CT Brain','mri brain':'MRI Brain',
+};
+
+// ═══════════════════════════════
+// INDEXEDDB
+// ═══════════════════════════════
+const DB_NAME = 'WOYZMobileDB', DB_VER = 1;
+let db = null;
+function openDB(){
+  return new Promise((res,rej)=>{
+    if(db){res(db);return;}
+    const req = indexedDB.open(DB_NAME,DB_VER);
+    req.onupgradeneeded = e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('notes')) d.createObjectStore('notes',{keyPath:'id'}).createIndex('ts','ts',{unique:false});
+      if(!d.objectStoreNames.contains('vocab')) d.createObjectStore('vocab',{keyPath:'key'});
+    };
+    req.onsuccess=e=>{db=e.target.result;res(db);};
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function persistNote(note){
+  try{const d=await openDB();return new Promise((res,rej)=>{const tx=d.transaction('notes','readwrite');tx.objectStore('notes').put(note);tx.oncomplete=res;tx.onerror=rej;});}catch(e){showToast('Save error');}
+}
+async function saveVocab(){
+  try{const d=await openDB();const tx=d.transaction('vocab','readwrite');const st=tx.objectStore('vocab');st.clear();Object.entries(corrections).forEach(([k,v])=>st.put({key:k,value:v}));}catch(e){}
+}
+async function loadVocab(){
+  try{const d=await openDB();return new Promise(res=>{const req=d.transaction('vocab','readonly').objectStore('vocab').getAll();req.onsuccess=()=>{(req.result||[]).forEach(r=>corrections[r.key]=r.value);res();};req.onerror=()=>res();});}catch(e){}
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+function init(){
+  TEMPLATE.sections.forEach(s=>noteData[s.id]='');
+  buildSections();
+  buildQuickList();
+  loadProfile();
+  loadApiKeyStatus();
+  loadVocab().then(renderVocabList);
+  updateProgress();
+  checkNoteEmpty();
+  updateHeader();
+}
+
+// ═══════════════════════════════
+// SCREEN SWITCHING
+// ═══════════════════════════════
+function switchScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('s-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  activeScreen = name;
+  if(name==='preview') renderPreview();
+}
+
+// ═══════════════════════════════
+// BUILD QUICK LIST (Dictate screen)
+// ═══════════════════════════════
+function buildQuickList(){
+  const list = document.getElementById('quickList');
+  if(!list) return;
+  list.innerHTML = '';
+  TEMPLATE.sections.forEach((sec, i) => {
+    const item = document.createElement('div');
+    item.className = 'ql-item';
+    item.id = 'ql-'+sec.id;
+    item.onclick = () => quickTapSection(sec.id);
+    item.innerHTML =
+      `<div class="ql-num" id="qn-${sec.id}">${i+1}</div>`+
+      `<div class="ql-title" id="qt-${sec.id}">${sec.title}</div>`+
+      `<div class="ql-rec" id="qr-${sec.id}"><div class="ql-rec-dot"></div>REC</div>`+
+      `<div class="ql-check" id="qc-${sec.id}"></div>`;
+    list.appendChild(item);
+  });
+}
+
+function quickTapSection(id){
+  // If full dictation running, warn
+  if(singleRecording){ showToast('Stop full dictation first'); return; }
+  // Switch to sections screen and tap that section
+  switchScreen('note');
+  setTimeout(()=>tapSection(id), 80);
+}
+
+function syncQuickList(){
+  TEMPLATE.sections.forEach(s=>{
+    const item = document.getElementById('ql-'+s.id);
+    const check = document.getElementById('qc-'+s.id);
+    const rec = document.getElementById('qr-'+s.id);
+    if(!item) return;
+    const filled = !!(noteData[s.id]&&noteData[s.id].trim());
+    const isActive = activeSectionId === s.id;
+    item.className = 'ql-item' + (filled?' ql-filled':'') + (isActive?' ql-active':'');
+    if(check) check.textContent = filled ? '✓' : '';
+    if(rec) rec.classList.toggle('show', isActive);
+  });
+}
+function buildSections(){
+  const list = document.getElementById('sectionsList');
+  list.innerHTML = '';
+  TEMPLATE.sections.forEach((sec,i)=>{
+    const card = document.createElement('div');
+    card.className = 'sec-card';
+    card.id = 'sc-'+sec.id;
+    card.innerHTML = `
+      <div class="sec-card-head" onclick="tapSection('${sec.id}')">
+        <div class="sec-num" id="sn-${sec.id}">${i+1}</div>
+        <div class="sec-card-info">
+          <div class="sec-card-title">${sec.title}</div>
+          <div class="sec-card-hint" id="hint-${sec.id}">${sec.hint}</div>
+        </div>
+        <div class="rec-badge" id="rec-${sec.id}"><div class="rec-dot"></div>REC</div>
+        <div class="sec-status" id="st-${sec.id}"></div>
+      </div>
+      <div class="sec-body-wrap" id="bw-${sec.id}">
+        <div class="sec-body" id="nb-${sec.id}" contenteditable="true"
+          data-placeholder="${sec.hint}"
+          oninput="onNoteEdit('${sec.id}')"></div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════
+// TAP SECTION (individual record)
+// ═══════════════════════════════
+function tapSection(id){
+  if(singleRecording){ showToast('Stop full dictation first'); return; }
+
+  // Toggle expand
+  const bw = document.getElementById('bw-'+id);
+  const wasOpen = bw.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.sec-body-wrap').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.sec-card').forEach(c=>c.classList.remove('active'));
+
+  if(!wasOpen){
+    bw.classList.add('open');
+    document.getElementById('sc-'+id).classList.add('active');
+    // If already recording another section stop it
+    if(activeSectionId && activeSectionId !== id){
+      stopSectionDictation(activeSectionId);
+    }
+    startSectionDictation(id);
+    // Scroll to it
+    document.getElementById('sc-'+id).scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else {
+    if(activeSectionId===id){
+      if(window._secRecorder && window._secRecorder.state!=='inactive') window._secRecorder.stop();
+      else stopSectionDictation(id);
+    }
+  }
+}
+
+function startSectionDictation(id){
+  activeSectionId = id;
+  document.getElementById('rec-'+id)?.classList.add('show');
+  document.querySelectorAll('.sec-body').forEach(b=>b.classList.remove('dictating'));
+  document.getElementById('nb-'+id)?.classList.add('dictating');
+  setHint('Recording: '+TEMPLATE.sections.find(s=>s.id===id)?.title+' — tap again to stop', 'red');
+  syncQuickList();
+  if(getApiKey()) startSectionRecording(id);
+  else { showToast('Add API key in Training tab ⚙ to enable real dictation'); stopSectionDictation(id); }
+}
+
+async function startSectionRecording(id){
+  const sec = TEMPLATE.sections.find(s=>s.id===id);
+  try{
+    const stream = await getMicStream();
+    let chunks=[];
+    const mt = getSupportedMimeType();
+    let mr;
+    try{mr=mt?new MediaRecorder(stream,{mimeType:mt}):new MediaRecorder(stream);}catch(e){mr=new MediaRecorder(stream);}
+    window._secRecorder = mr;
+    mr.ondataavailable = e=>{if(e.data&&e.data.size>0)chunks.push(e.data);};
+    mr.onstop = async()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      window._secRecorder=null;
+      if(!chunks.length){stopSectionDictation(id);return;}
+      setHint('Transcribing '+sec.title+'...','green');
+      try{
+        const mimeType=mr.mimeType||'audio/mp4';
+        const ext=mimeType.includes('mp4')?'mp4':mimeType.includes('ogg')?'ogg':'webm';
+        const blob=new Blob(chunks,{type:mimeType});
+        const fd=new FormData();
+        fd.append('file',blob,'rec.'+ext);
+        fd.append('model','whisper-1');
+        fd.append('language','en');
+        const vocab=Object.values(corrections).slice(0,60).join(', ');
+        if(vocab) fd.append('prompt',vocab);
+        const res=await fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey()},body:fd});
+        if(res.status===401){showToast('Invalid API key');stopSectionDictation(id);return;}
+        if(!res.ok)throw new Error('Error '+res.status);
+        const data=await res.json();
+        const transcript=(data.text||'').trim();
+        if(!transcript){showToast('No speech detected');stopSectionDictation(id);return;}
+        const nb=document.getElementById('nb-'+id);
+        if(nb){
+          const existing=nb.textContent.trim();
+          const merged=existing?existing+' '+transcript:transcript;
+          nb.textContent=merged;
+          noteData[id]=merged;
+          nb.classList.add('just-filled');
+          setTimeout(()=>nb.classList.remove('just-filled'),600);
+        }
+        applyCorrections(id);
+        updateProgress();updateSectionStatus(id);checkNoteEmpty();
+        showToast(sec.title+' done ✓');
+      }catch(err){showToast('Error: '+err.message);}
+      stopSectionDictation(id);
+    };
+    mr.onerror=()=>{showToast('Recording error');stopSectionDictation(id);};
+    mr.start(500);
+  }catch(err){
+    if(err.name==='NotAllowedError') showToast('Microphone blocked — check browser settings');
+    else showToast('Mic error: '+err.message);
+    stopSectionDictation(id);
+  }
+}
+
+function stopSectionDictation(id){
+  document.getElementById('rec-'+id)?.classList.remove('show');
+  document.getElementById('nb-'+id)?.classList.remove('dictating');
+  if(activeSectionId===id) activeSectionId=null;
+  setHint('Tap a section to dictate into it','green');
+  syncQuickList();
+}
+
+// ═══════════════════════════════
+// FULL NOTE DICTATION (Big Button)
+// ═══════════════════════════════
+function handleDictClick(){
+  if(singleRecording){ showToast('Tap "Stop & Save" or Pause'); return; }
+  if(singlePaused){ resumeDictation(); return; }
+  startFullDictation();
+}
+
+async function startFullDictation(){
+  if(!getApiKey()){ showToast('Add your OpenAI API key in Training tab first'); return; }
+  try{
+    sharedMicStream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+    singleAudioChunks=[];
+    const mt=getSupportedMimeType();
+    let mr;
+    try{mr=mt?new MediaRecorder(sharedMicStream,{mimeType:mt}):new MediaRecorder(sharedMicStream);}catch(e){mr=new MediaRecorder(sharedMicStream);}
+    singleMediaRecorder=mr;
+    mr.ondataavailable=e=>{if(e.data&&e.data.size>0)singleAudioChunks.push(e.data);};
+    mr.onstop=async()=>{
+      if(!singlePaused){
+        if(sharedMicStream){sharedMicStream.getTracks().forEach(t=>t.stop());sharedMicStream=null;}
+        await processFullDictation();
+      }
+    };
+    mr.start(500);
+    singleRecording=true;singlePaused=false;
+    setDictUI('recording');
+    startTimer();
+    showToast('Dictating — speak your full visit note');
+    // switch to note screen so progress is visible
+    switchScreen('note');
+  }catch(err){
+    if(err.name==='NotAllowedError') showToast('Microphone blocked — please allow access');
+    else showToast('Cannot start mic: '+err.message);
+  }
+}
+
+function stopAndProcess(){
+  if(!singleRecording&&!singlePaused){return;}
+  singlePaused=false;
+  stopTimer();
+  if(singleMediaRecorder&&singleMediaRecorder.state!=='inactive') singleMediaRecorder.stop();
+  else processFullDictation();
+}
+
+async function togglePause(){
+  if(!singlePaused){
+    // Pause
+    singlePaused=true;
+    stopTimer();
+    if(singleMediaRecorder&&singleMediaRecorder.state==='recording'){
+      singleMediaRecorder.requestData();
+      singleMediaRecorder.stop();
+    }
+    setDictUI('paused');
+    showToast('Paused — tap Resume to continue');
+  } else {
+    resumeDictation();
+  }
+}
+
+async function resumeDictation(){
+  singlePaused=false;
+  try{
+    const stream = sharedMicStream&&sharedMicStream.active ? sharedMicStream : await getMicStream();
+    const mt=getSupportedMimeType();
+    let mr;
+    try{mr=mt?new MediaRecorder(stream,{mimeType:mt}):new MediaRecorder(stream);}catch(e){mr=new MediaRecorder(stream);}
+    mr.ondataavailable=e=>{if(e.data&&e.data.size>0)singleAudioChunks.push(e.data);};
+    mr.onstop=async()=>{
+      if(!singlePaused){
+        if(sharedMicStream){sharedMicStream.getTracks().forEach(t=>t.stop());sharedMicStream=null;}
+        await processFullDictation();
+      }
+    };
+    mr.start(500);
+    singleMediaRecorder=mr;
+    startTimer();
+    setDictUI('recording');
+    showToast('Recording resumed');
+  }catch(err){showToast('Could not resume: '+err.message);}
+}
+
+async function processFullDictation(){
+  const overlay=document.getElementById('aiOverlay');
+  const step=document.getElementById('aiStep');
+  overlay.classList.add('show');
+  singleRecording=false;
+  setDictUI('idle');
+
+  try{
+    step.textContent='Transcribing audio...';
+    if(!singleAudioChunks.length){showToast('No audio recorded');overlay.classList.remove('show');return;}
+    const mimeType=(singleMediaRecorder&&singleMediaRecorder.mimeType)||'audio/mp4';
+    const ext=mimeType.includes('mp4')?'mp4':mimeType.includes('ogg')?'ogg':'webm';
+    const blob=new Blob(singleAudioChunks,{type:mimeType});
+    const fd=new FormData();
+    fd.append('file',blob,'fullnote.'+ext);
+    fd.append('model','whisper-1');
+    fd.append('language','en');
+    const vocab=Object.values(corrections).slice(0,60).join(', ');
+    if(vocab) fd.append('prompt',vocab);
+    const res=await fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{'Authorization':'Bearer '+getApiKey()},body:fd});
+    if(res.status===401){showToast('Invalid API key');overlay.classList.remove('show');return;}
+    if(!res.ok)throw new Error('Error '+res.status);
+    const tr=await res.json();
+    const transcript=(tr.text||'').trim();
+    if(!transcript){showToast('No speech detected');overlay.classList.remove('show');return;}
+
+    const tp=document.getElementById('transcriptPreview');
+    tp.textContent=transcript;tp.classList.add('show');
+
+    step.textContent='AI structuring note...';
+    const sectionList=TEMPLATE.sections.map(s=>`${s.id}: "${s.title}"`).join('\n');
+    const gptRes=await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+getApiKey(),'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'gpt-4o',
+        temperature:0.2,
+        messages:[
+          {role:'system',content:`You are a clinical note structuring assistant for a neurologist. 
+Given a free dictation transcript, extract and assign content to the correct section IDs from this list:
+${sectionList}
+
+Return ONLY a JSON object like: {"cc":"...","hpi":"...","pmh":"..."}
+Include only sections with content. Use proper medical English. Correct drug spellings.
+Do not invent information not present in the dictation.`},
+          {role:'user',content:'Dictation transcript:\n'+transcript}
+        ]
+      })
+    });
+    if(!gptRes.ok)throw new Error('GPT error '+gptRes.status);
+    const gptData=await gptRes.json();
+    let raw=gptData.choices[0].message.content.trim();
+    raw=raw.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(raw);
+    let filled=0;
+    TEMPLATE.sections.forEach((s,i)=>{
+      const val=parsed[s.id];
+      if(val&&val.trim()){
+        noteData[s.id]=val.trim();
+        filled++;
+        const nb=document.getElementById('nb-'+s.id);
+        if(nb){
+          setTimeout(()=>{
+            nb.textContent=val.trim();
+            nb.classList.add('just-filled');
+            setTimeout(()=>nb.classList.remove('just-filled'),600);
+          },i*80);
+        }
+        updateSectionStatus(s.id);
+      }
+    });
+    setTimeout(()=>{updateProgress();checkNoteEmpty();},TEMPLATE.sections.length*80+100);
+    if(filled===0) showToast('AI found no matching sections — check transcript');
+    else showToast(filled+' section'+(filled===1?'':'s')+' filled ✓ — review and edit');
+    // Go back to dictate screen
+    switchScreen('dictate');
+  }catch(err){
+    console.error('processFullDictation error:',err);
+    showToast('Error: '+err.message);
+  }
+  overlay.classList.remove('show');
+  singleAudioChunks=[];
+}
+
+// ═══════════════════════════════
+// MIC HELPERS
+// ═══════════════════════════════
+async function getMicStream(){
+  if(sharedMicStream&&sharedMicStream.active) return sharedMicStream;
+  sharedMicStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+  return sharedMicStream;
+}
+function getSupportedMimeType(){
+  const types=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'];
+  for(const t of types){try{if(MediaRecorder.isTypeSupported(t))return t;}catch(e){}}
+  return '';
+}
+
+// ═══════════════════════════════
+// UI STATES
+// ═══════════════════════════════
+function setDictUI(state){
+  const btn=document.getElementById('bigDictBtn');
+  const icon=document.getElementById('dictIcon');
+  const label=document.getElementById('dictLabel');
+  const sub=document.getElementById('dictSubLabel');
+  const wave=document.getElementById('dictWave');
+  const ctrl=document.getElementById('ctrlRow');
+  const pauseIcon=document.getElementById('pauseIcon');
+  const pauseLabel=document.getElementById('pauseLabel');
+  const status=document.getElementById('timerStatus');
+
+  btn.className='big-dict-btn';
+  ctrl.style.display='none';
+
+  if(state==='recording'){
+    btn.classList.add('recording');
+    icon.textContent='⏺';
+    label.textContent='Recording…';
+    sub.textContent='Speak your visit note';
+    wave.classList.add('on');
+    ctrl.style.display='grid';
+    pauseIcon.textContent='⏸';pauseLabel.textContent='Pause';
+    status.textContent='REC';status.className='timer-status rec';
+    singleRecording=true;
+  }else if(state==='paused'){
+    btn.classList.add('paused');
+    icon.textContent='⏸';
+    label.textContent='Paused';
+    sub.textContent='Tap to resume';
+    wave.classList.remove('on');
+    ctrl.style.display='grid';
+    pauseIcon.textContent='▶';pauseLabel.textContent='Resume';
+    status.textContent='PAUSED';status.className='timer-status paused';
+  }else{
+    icon.textContent='🎙';
+    label.textContent='Dictate Now';
+    sub.textContent='Tap to start full note';
+    wave.classList.remove('on');
+    status.textContent='Ready';status.className='timer-status';
+    singleRecording=false;singlePaused=false;
+  }
+}
+
+function setHint(text, color){
+  const dot=document.getElementById('hintDot');
+  const txt=document.getElementById('hintText');
+  if(txt) txt.textContent=text;
+  if(dot) dot.style.background=color==='red'?'var(--red)':'var(--green)';
+}
+
+// ═══════════════════════════════
+// TIMER
+// ═══════════════════════════════
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    timerSeconds++;
+    const m=Math.floor(timerSeconds/60).toString().padStart(2,'0');
+    const s=(timerSeconds%60).toString().padStart(2,'0');
+    document.getElementById('timerDisplay').textContent=m+':'+s;
+  },1000);
+}
+function stopTimer(){ clearInterval(timerInterval); }
+
+// ═══════════════════════════════
+// NOTE EDITING
+// ═══════════════════════════════
+function onNoteEdit(id){
+  const nb=document.getElementById('nb-'+id);
+  if(nb) noteData[id]=nb.textContent.trim();
+  updateProgress();updateSectionStatus(id);checkNoteEmpty();
+}
+function applyCorrections(id){
+  const nb=document.getElementById('nb-'+id);
+  if(!nb) return;
+  let text=nb.textContent;let changed=false;
+  Object.entries(corrections).forEach(([w,r])=>{
+    const rx=new RegExp('\\b'+w+'\\b','gi');
+    if(rx.test(text)){text=text.replace(rx,r);changed=true;}
+  });
+  if(changed){nb.textContent=text;noteData[id]=text;}
+}
+function updateSectionStatus(id){
+  const filled=!!(noteData[id]&&noteData[id].trim());
+  document.getElementById('sc-'+id)?.classList.toggle('filled',filled&&activeSectionId!==id);
+  const st=document.getElementById('st-'+id);
+  if(st) st.textContent=filled?'✓':'';
+  syncQuickList();
+}
+function checkNoteEmpty(){
+  const hasAny=TEMPLATE.sections.some(s=>noteData[s.id]&&noteData[s.id].trim());
+  document.getElementById('prevEmpty').style.display=hasAny?'none':'flex';
+  document.getElementById('prevContent').style.display=hasAny?'block':'none';
+}
+function updateProgress(){
+  const filled=TEMPLATE.sections.filter(s=>noteData[s.id]&&noteData[s.id].trim()).length;
+  const pct=Math.round((filled/TEMPLATE.sections.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+}
+function updateHeader(){
+  const n=document.getElementById('patName')?.value;
+  const a=document.getElementById('patAge')?.value;
+  document.getElementById('noteHdrTitle').textContent=n||'Visit Note';
+  document.getElementById('noteHdrMeta').textContent=a?a+' · Tap section to dictate':'Tap a section to dictate';
+}
+
+// ═══════════════════════════════
+// PREVIEW
+// ═══════════════════════════════
+function renderPreview(){
+  const n=document.getElementById('patName').value;
+  const m=document.getElementById('patMrd').value;
+  const a=document.getElementById('patAge').value;
+  const dateStr=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('prevPatient').textContent=n||'Patient';
+  document.getElementById('prevMeta').textContent=[a,m?'UHID: '+m:'',dateStr,getDoctorName()].filter(Boolean).join(' · ');
+  const secs=document.getElementById('prevSections');
+  secs.innerHTML='';
+  TEMPLATE.sections.forEach(s=>{
+    if(noteData[s.id]&&noteData[s.id].trim()){
+      secs.innerHTML+=`<div class="prev-sec-title">${s.title}</div><div class="prev-sec-body">${noteData[s.id].trim()}</div>`;
+    }
+  });
+  checkNoteEmpty();
+}
+
+// ═══════════════════════════════
+// EXPORT
+// ═══════════════════════════════
+function copyNote(){
+  const n=document.getElementById('patName').value;
+  const m=document.getElementById('patMrd').value;
+  const a=document.getElementById('patAge').value;
+  let txt='VISIT NOTE\n';
+  txt+='Patient: '+(n||'--')+' | UHID: '+(m||'--')+' | Age/Sex: '+(a||'--')+'\n';
+  txt+='Date: '+new Date().toLocaleDateString('en-IN')+'\n';
+  txt+='Physician: '+getDoctorName()+'\n\n';
+  TEMPLATE.sections.forEach(s=>{if(noteData[s.id]?.trim()) txt+=s.title.toUpperCase()+'\n'+noteData[s.id].trim()+'\n\n';});
+  navigator.clipboard.writeText(txt).then(()=>showToast('Copied to clipboard ✓')).catch(()=>showToast('Copy ready'));
+}
+function waNote(){
+  const n=document.getElementById('patName').value;
+  const a=document.getElementById('patAge').value;
+  let txt='*Visit Note*\n'+getDoctorName()+'\nPatient: '+(n||'--')+' | Age: '+(a||'--')+'\n\n';
+  TEMPLATE.sections.forEach(s=>{if(noteData[s.id]?.trim()) txt+='*'+s.title+'*\n'+noteData[s.id].trim()+'\n\n';});
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+function saveToFiles(){
+  const n=document.getElementById('patName').value.trim();
+  const m=document.getElementById('patMrd').value.trim();
+  const a=document.getElementById('patAge').value.trim();
+  const dateStr=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const timeStr=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  let txt='VISIT NOTE\n'+'='.repeat(50)+'\n';
+  txt+='Patient  : '+(n||'--')+'\nUHID     : '+(m||'--')+'\nAge/Sex  : '+(a||'--')+'\n';
+  txt+='Date     : '+dateStr+' at '+timeStr+'\nPhysician: '+getDoctorName()+'\n'+'='.repeat(50)+'\n\n';
+  TEMPLATE.sections.forEach(s=>{txt+=s.title.toUpperCase()+'\n'+(noteData[s.id]?.trim()||'Not dictated')+'\n\n';});
+  const blob=new Blob([txt],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a2=document.createElement('a');
+  a2.href=url;a2.download='WOYZ-'+(n||'note').replace(/[^a-zA-Z0-9]/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a2);a2.click();document.body.removeChild(a2);URL.revokeObjectURL(url);
+  showToast('Saved ✓');
+}
+function printNote(){
+  const n=document.getElementById('patName').value;
+  const m=document.getElementById('patMrd').value;
+  const a=document.getElementById('patAge').value;
+  let html='<html><head><title>Visit Note</title><style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;color:#111;line-height:1.7;}h1{font-size:22px;font-weight:400;margin-bottom:4px;}.meta{font-size:13px;color:#666;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid #ddd;}.st{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#2563a8;margin-bottom:6px;margin-top:20px;}.sb{font-size:14px;line-height:1.8;color:#374151;white-space:pre-line;}@media print{.no-print{display:none!important;}}</style></head><body>';
+  html+='<div class="no-print"><button onclick="window.close()" style="padding:8px 16px;background:#1c2b3a;color:white;border:none;border-radius:7px;cursor:pointer;margin-bottom:20px;font-size:13px;">← Back</button></div>';
+  html+='<h1>Visit Note</h1><div class="meta">'+n+' · '+a+' · UHID: '+m+'<br>'+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})+' · '+getDoctorName()+'</div>';
+  TEMPLATE.sections.forEach(s=>{if(noteData[s.id]?.trim()) html+='<div class="st">'+s.title+'</div><div class="sb">'+noteData[s.id].trim()+'</div>';});
+  html+='</body></html>';
+  const w=window.open('','_blank');w.document.write(html);w.document.close();w.focus();setTimeout(()=>w.print(),500);
+}
+
+// ═══════════════════════════════
+// SAVE / CLEAR
+// ═══════════════════════════════
+async function saveNote(){
+  const hasContent=TEMPLATE.sections.some(s=>noteData[s.id]&&noteData[s.id].trim());
+  if(!hasContent){showToast('Nothing to save — dictate first');return;}
+  const n=document.getElementById('patName').value.trim();
+  const m=document.getElementById('patMrd').value.trim();
+  const a=document.getElementById('patAge').value.trim();
+  const note={id:currentNoteId||(currentNoteId='note_'+Date.now()),ts:Date.now(),template:'stroke',label:TEMPLATE.label,patient:n,mrd:m,age:a,sections:{...noteData}};
+  await persistNote(note);
+  showToast('Note saved ✓');
+}
+function clearAll(silent){
+  if(!silent&&!confirm('Clear all content?')) return;
+  TEMPLATE.sections.forEach(s=>{
+    noteData[s.id]='';
+    const nb=document.getElementById('nb-'+s.id);
+    if(nb) nb.textContent='';
+    updateSectionStatus(s.id);
+  });
+  document.getElementById('transcriptPreview').classList.remove('show');
+  document.getElementById('transcriptPreview').textContent='';
+  currentNoteId=null;
+  updateProgress();checkNoteEmpty();syncQuickList();
+  if(!silent) showToast('Cleared');
+}
+function newPatient(){
+  if(!confirm('Start new patient? This will clear the current note.')) return;
+  ['patName','patMrd','patAge'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  clearAll(true);
+  timerSeconds=0;document.getElementById('timerDisplay').textContent='00:00';
+  showToast('Ready for new patient');
+  switchScreen('dictate');
+}
+
+// ═══════════════════════════════
+// PROFILE & API KEY
+// ═══════════════════════════════
+function getDoctorName(){
+  const n=localStorage.getItem('woyz_doc_name');
+  const d=localStorage.getItem('woyz_doc_dept');
+  if(n&&d) return n+', '+d;
+  if(n) return n;
+  return 'Dr. Gigy Kuruttukulam MD, DM';
+}
+function loadProfile(){
+  const n=localStorage.getItem('woyz_doc_name');
+  const d=localStorage.getItem('woyz_doc_dept');
+  if(n) document.getElementById('doctorName').value=n;
+  if(d) document.getElementById('doctorDept').value=d;
+}
+function saveProfile(){
+  const n=document.getElementById('doctorName').value.trim();
+  const d=document.getElementById('doctorDept').value.trim();
+  localStorage.setItem('woyz_doc_name',n);
+  localStorage.setItem('woyz_doc_dept',d);
+  document.getElementById('profileStatus').textContent='✓ Profile saved';
+  setTimeout(()=>document.getElementById('profileStatus').textContent='',3000);
+}
+function getApiKey(){ return localStorage.getItem('woyz_api_key')||''; }
+function loadApiKeyStatus(){
+  const k=getApiKey();
+  // Never pre-fill the input — key stays hidden
+  document.getElementById('apiStatus').textContent=k?'✓ API key active — real dictation enabled':'No key set';
+  document.getElementById('apiStatus').style.color=k?'#15803d':'var(--ink3)';
+}
+function saveApiKey(){
+  const k=document.getElementById('apiKeyInput').value.trim();
+  if(!k){showToast('Enter an API key first');return;}
+  localStorage.setItem('woyz_api_key',k);
+  document.getElementById('apiKeyInput').value=''; // clear immediately
+  loadApiKeyStatus();
+  showToast('API key saved ✓');
+}
+function clearApiKey(){
+  localStorage.removeItem('woyz_api_key');
+  document.getElementById('apiKeyInput').value='';
+  loadApiKeyStatus();
+  showToast('API key cleared');
+}
+
+function openSettings(){ switchScreen('training'); }
+
+// ═══════════════════════════════
+// VOCABULARY / TRAINING
+// ═══════════════════════════════
+function addVocab(){
+  const inp=document.getElementById('vocabInput');
+  const val=inp.value.trim();
+  if(!val){showToast('Enter a word or phrase');return;}
+  corrections[val.toLowerCase()]=val;
+  inp.value='';
+  saveVocab();
+  renderVocabList();
+  showToast('"'+val+'" added ✓');
+}
+function deleteVocab(key){
+  delete corrections[key];
+  saveVocab();
+  renderVocabList();
+}
+function renderVocabList(){
+  const list=document.getElementById('vocabList');
+  const custom=Object.entries(corrections).filter(([k])=>!['nihss','mrs','tpa','hba1c','gcs','umnf','ct brain','mri brain','aspirin 75 mg','clopidogrel 75 mg','atorvastatin 40 mg','apixaban 5 mg','warfarin','amlodipine 5 mg'].includes(k));
+  if(!custom.length){list.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,.30);padding:8px 0;">No custom terms yet</div>';return;}
+  list.innerHTML=custom.map(([k,v])=>`<div class="vocab-item"><span class="vocab-word">${v}</span><button class="vocab-del" onclick="deleteVocab('${k}')">✕</button></div>`).join('');
+}
+
+// ═══════════════════════════════
+// TOAST
+// ═══════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ═══════════════════════════════
+// START
+// ═══════════════════════════════
+init();
+</script>
+</body>
+</html>
