@@ -69,8 +69,8 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 /* ═══════════════════════════════════════
    SCREEN 1 — DICTATE
 ═══════════════════════════════════════ */
-#s-dictate{background:var(--surface);overflow-y:auto;}
-.dictate-shell{padding:16px 16px 24px;display:flex;flex-direction:column;gap:14px;}
+#s-dictate{background:var(--surface);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.dictate-shell{padding:12px 14px 28px;display:flex;flex-direction:column;gap:10px;}
 
 /* Patient row */
 .pat-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:stretch;}
@@ -328,6 +328,127 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 .ql-rec.show{display:flex;}
 .ql-rec-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1s ease-in-out infinite;}
 
+
+/* ── INLINE SECTIONS ON DICTATE SCREEN ── */
+.inline-secs-label{
+  font-size:9.5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;
+  color:var(--ink3);padding:2px 0 6px;
+}
+.isec-card{
+  background:white;border:1.5px solid var(--border);border-radius:12px;
+  margin-bottom:8px;overflow:hidden;transition:border-color .15s, box-shadow .15s;
+}
+.isec-card.isec-filled{border-color:rgba(22,163,74,.35);}
+.isec-card.isec-active{border-color:var(--blue);box-shadow:0 2px 10px rgba(26,107,181,.14);}
+
+.isec-head{
+  display:flex;align-items:center;gap:9px;
+  padding:10px 12px;
+}
+.isec-num{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--navy);color:white;
+  font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .15s;
+}
+.isec-card.isec-filled .isec-num{background:var(--green);}
+.isec-card.isec-active .isec-num{background:var(--blue);}
+
+.isec-title{
+  flex:1;font-size:12.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.02em;color:var(--ink);
+}
+.isec-card.isec-filled .isec-title{color:var(--green);}
+.isec-card.isec-active .isec-title{color:var(--blue);}
+
+.isec-check{font-size:13px;color:var(--green);flex-shrink:0;}
+
+.isec-mic{
+  width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  background:rgba(26,107,181,.08);flex-shrink:0;
+  transition:background .12s;-webkit-tap-highlight-color:transparent;
+}
+.isec-card.isec-active .isec-mic{background:rgba(192,57,43,.10);}
+.isec-mic:active{transform:scale(.88);}
+
+.isec-rec{
+  display:none;align-items:center;gap:3px;
+  font-size:8.5px;font-weight:700;color:var(--red);
+  background:rgba(192,57,43,.08);border-radius:20px;
+  padding:2px 7px;flex-shrink:0;
+}
+.isec-rec.show{display:flex;}
+.isec-rec-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1s ease-in-out infinite;}
+
+.isec-body{
+  padding:0 12px 12px;
+  font-size:14px;line-height:1.75;color:var(--ink2);
+  outline:none;min-height:44px;
+  white-space:pre-wrap;word-break:break-word;
+  cursor:text;
+  border-top:1px solid transparent;transition:border-color .15s;
+}
+.isec-card.isec-active .isec-body{border-top-color:rgba(26,107,181,.10);}
+.isec-body:empty::before{content:attr(data-ph);color:rgba(0,0,0,.22);font-style:italic;pointer-events:none;}
+.isec-body.isec-dictating::after{content:'|';color:var(--blue);animation:cur-blink .7s step-end infinite;}
+@keyframes cur-blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.isec-body.just-filled{animation:sec-pop .5s ease both;}
+@keyframes sec-pop{from{background:rgba(26,107,181,.07);opacity:.6;}to{background:transparent;opacity:1;}}
+
+/* action-row 3 btns */
+.action-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+
+/* ── iOS-STYLE AGE/SEX PICKER ── */
+.picker-modal{
+  display:none;position:fixed;inset:0;z-index:700;
+  background:rgba(26,46,68,.60);backdrop-filter:blur(4px);
+  align-items:flex-end;justify-content:center;
+}
+.picker-modal.show{display:flex;}
+.picker-sheet{
+  background:white;border-radius:22px 22px 0 0;
+  width:100%;max-width:480px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  animation:sheet-up .22s ease;
+}
+@keyframes sheet-up{from{transform:translateY(50px);opacity:.4;}to{transform:none;opacity:1;}}
+.picker-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 10px;border-bottom:1px solid var(--border);
+}
+.picker-toolbar-title{font-size:14px;font-weight:700;color:var(--ink);}
+.picker-done{font-size:15px;font-weight:700;color:var(--blue);background:none;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;padding:4px 8px;}
+.picker-cancel{font-size:14px;font-weight:500;color:var(--ink3);background:none;border:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;padding:4px 8px;}
+.picker-drums{
+  display:flex;height:220px;overflow:hidden;position:relative;padding:0 20px;
+}
+.picker-drums::before,.picker-drums::after{
+  content:'';position:absolute;left:0;right:0;height:80px;z-index:2;pointer-events:none;
+}
+.picker-drums::before{top:0;background:linear-gradient(to bottom,rgba(255,255,255,1),rgba(255,255,255,0));}
+.picker-drums::after{bottom:0;background:linear-gradient(to top,rgba(255,255,255,1),rgba(255,255,255,0));}
+.picker-band{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  height:44px;pointer-events:none;z-index:1;
+  border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border);
+}
+.drum{
+  flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;position:relative;
+  padding:88px 0;
+}
+.drum::-webkit-scrollbar{display:none;}
+.drum-sep{width:1px;background:var(--border);margin:16px 0;flex-shrink:0;}
+.drum-item{
+  height:44px;display:flex;align-items:center;justify-content:center;
+  scroll-snap-align:start;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:20px;font-weight:500;color:var(--ink);
+}
+
 /* Toast */
 .toast{
   position:fixed;bottom:72px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -338,6 +459,119 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
   pointer-events:none;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ═══════════════════════════════════════
+   SCREEN 5 — TEMPLATE EDITOR
+═══════════════════════════════════════ */
+#s-template{background:var(--surface);}
+.tmpl-scroll{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch;}
+.tmpl-scroll::-webkit-scrollbar{width:3px;}
+
+.tmpl-page-title{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.tmpl-page-sub{font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:14px;}
+
+.tmpl-hint{
+  font-size:12px;color:var(--ink3);
+  background:white;border:1.5px solid var(--border);
+  border-radius:10px;padding:10px 13px;margin-bottom:12px;line-height:1.6;
+}
+.tmpl-hint strong{color:var(--blue);}
+
+/* Add form */
+.te-add-form{
+  background:white;border:1.5px dashed var(--border);
+  border-radius:12px;padding:12px;margin-bottom:10px;display:none;
+}
+.te-add-form.show{display:block;}
+.te-add-input{
+  width:100%;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:8px;padding:10px 12px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:var(--ink);
+  outline:none;margin-bottom:8px;
+}
+.te-add-input:focus{border-color:var(--blue);}
+.te-add-input::placeholder{color:#b0c4d4;}
+.te-add-btns{display:flex;gap:8px;}
+.te-add-confirm{
+  flex:1;height:38px;background:var(--blue);color:white;border:none;
+  border-radius:8px;font-family:'IBM Plex Sans',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;
+}
+.te-add-cancel{
+  height:38px;padding:0 14px;background:var(--surface);
+  color:var(--ink3);border:1.5px solid var(--border);border-radius:8px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;
+}
+
+/* Section cards */
+.te-card{
+  background:white;border:1.5px solid var(--border);border-radius:12px;
+  margin-bottom:8px;transition:opacity .2s, border-color .15s;
+}
+.te-card.te-disabled{opacity:.42;}
+.te-card.te-drag-over{border-color:var(--blue);background:rgba(26,107,181,.04);}
+.te-card.te-dragging{opacity:.35;border-style:dashed;}
+
+.te-row{display:flex;align-items:center;gap:10px;padding:11px 12px;}
+
+.te-drag{
+  font-size:18px;color:#b0c4d4;cursor:grab;
+  flex-shrink:0;padding:4px 3px;touch-action:none;line-height:1;
+}
+.te-drag:active{cursor:grabbing;}
+
+.te-num{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--navy);color:white;
+  font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.te-card.te-disabled .te-num{background:#b0c4d4;}
+
+.te-name{
+  flex:1;font-size:13.5px;font-weight:600;color:var(--ink);
+  background:none;border:none;outline:none;
+  font-family:'IBM Plex Sans',sans-serif;
+  padding:3px 0;border-bottom:1.5px solid transparent;
+  transition:border-color .15s;min-width:0;
+}
+.te-name:focus{border-bottom-color:var(--blue);}
+.te-name:disabled{color:var(--ink3);}
+
+.te-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+
+.te-toggle{
+  width:44px;height:26px;border-radius:13px;
+  background:#b0c4d4;border:none;cursor:pointer;
+  position:relative;transition:background .2s;flex-shrink:0;
+}
+.te-toggle::after{
+  content:'';width:18px;height:18px;border-radius:50%;
+  background:white;position:absolute;top:4px;left:4px;
+  transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.te-toggle.on{background:var(--blue);}
+.te-toggle.on::after{transform:translateX(18px);}
+
+.te-del{
+  background:none;border:none;color:#f87171;cursor:pointer;
+  font-size:18px;padding:4px 6px;line-height:1;min-width:36px;text-align:center;
+}
+
+/* Add + Reset buttons */
+.te-top-row{display:flex;gap:8px;margin-bottom:12px;}
+.te-top-add{
+  flex:1;height:40px;background:var(--blue);color:white;border:none;
+  border-radius:10px;font-family:'IBM Plex Sans',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.te-top-reset{
+  height:40px;padding:0 14px;background:var(--surface);
+  color:var(--ink3);border:1.5px solid var(--border);border-radius:10px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -368,9 +602,12 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
       <label>UHID</label>
       <input id="patMrd" placeholder="UHID">
     </div>
-    <div class="pat-field-sm">
+    <div class="pat-field-sm" onclick="openAgeSexPicker()" style="cursor:pointer;">
       <label>Age/Sex</label>
-      <input id="patAge" placeholder="62 M">
+      <div id="ageSexDisplay" style="font-size:14px;font-weight:500;color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+        <span id="ageSexText">Select</span>
+        <span style="color:var(--ink3);font-size:16px;line-height:1;">›</span>
+      </div>
     </div>
   </div>
 
@@ -423,10 +660,15 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
     <button class="action-btn clear" onclick="clearAll()">🗑 Clear</button>
   </div>
 
-  <!-- Section quick list -->
-  <div class="ql-wrap">
-    <div class="ql-label">Visit Note — tap section to dictate</div>
-    <div class="ql-list" id="quickList"></div>
+  <!-- Inline editable note sections -->
+  <div class="inline-secs-label">Visit Note — tap 🎤 to dictate a section</div>
+  <div id="inlineSections"></div>
+
+  <!-- Export row -->
+  <div class="action-row" style="margin-top:4px;">
+    <button class="action-btn save" onclick="saveNote()">💾 Save</button>
+    <button class="action-btn" style="background:#fef2f2;color:#9b2226;border:1.5px solid #fca5a5;" onclick="clearAll()">🗑 Clear</button>
+    <button class="action-btn" style="background:rgba(26,107,181,.10);color:var(--blue);border:1.5px solid rgba(26,107,181,.25);" onclick="waNote()">💬 WA</button>
   </div>
 
 </div>
@@ -509,15 +751,46 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 </div>
 </div>
 
+
+<!-- ═══ SCREEN 5: TEMPLATE EDITOR ═══ -->
+<div class="screen" id="s-template">
+<div class="tmpl-scroll">
+  <div class="tmpl-page-title">Template Editor</div>
+  <div class="tmpl-page-sub">Customise which sections appear in your visit note.</div>
+
+  <div class="te-top-row">
+    <button class="te-top-add" onclick="teShowAdd()">＋ Add Section</button>
+    <button class="te-top-reset" onclick="teReset()">↺ Reset</button>
+  </div>
+
+  <div class="te-add-form" id="teAddForm">
+    <input class="te-add-input" id="teAddInput" placeholder="Section name e.g. Stroke Scale">
+    <div class="te-add-btns">
+      <button class="te-add-confirm" onclick="teConfirmAdd()">Add</button>
+      <button class="te-add-cancel" onclick="teHideAdd()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="tmpl-hint">
+    <strong>Drag ⠿</strong> to reorder &nbsp;·&nbsp;
+    <strong>Tap name</strong> to rename &nbsp;·&nbsp;
+    <strong>Toggle</strong> to hide &nbsp;·&nbsp;
+    <strong>✕</strong> to delete
+  </div>
+
+  <div id="teList"></div>
+</div>
+</div>
+
 <!-- BOTTOM NAV -->
 <nav class="bnav">
   <button class="bnav-item active" id="nav-dictate" onclick="switchScreen('dictate')">
     <span class="bnav-icon">🎙</span>
     <span class="bnav-label">Dictate</span>
   </button>
-  <button class="bnav-item" id="nav-note" onclick="switchScreen('note')">
-    <span class="bnav-icon">📋</span>
-    <span class="bnav-label">Sections</span>
+  <button class="bnav-item" id="nav-template" onclick="switchScreen('template')">
+    <span class="bnav-icon">✏️</span>
+    <span class="bnav-label">Template</span>
   </button>
   <button class="bnav-item" id="nav-preview" onclick="switchScreen('preview')">
     <span class="bnav-icon">📄</span>
@@ -540,6 +813,24 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 </div>
 
 <!-- Toast -->
+
+<!-- Age & Sex iOS Picker -->
+<div class="picker-modal" id="pickerModal" onclick="if(event.target===this)closePicker()">
+  <div class="picker-sheet">
+    <div class="picker-toolbar">
+      <button class="picker-cancel" onclick="closePicker()">Cancel</button>
+      <div class="picker-toolbar-title">Age &amp; Sex</div>
+      <button class="picker-done" onclick="donePicker()">Done</button>
+    </div>
+    <div class="picker-drums">
+      <div class="picker-band"></div>
+      <div class="drum" id="drumAge"></div>
+      <div class="drum-sep"></div>
+      <div class="drum" id="drumSex" style="flex:0 0 110px;"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -618,9 +909,10 @@ async function loadVocab(){
 // INIT
 // ═══════════════════════════════
 function init(){
-  TEMPLATE.sections.forEach(s=>noteData[s.id]='');
-  buildSections();
-  buildQuickList();
+  applyCustomTemplate();
+  TEMPLATE.sections.forEach(s=>{ if(noteData[s.id]===undefined) noteData[s.id]=''; });
+  buildInlineSections();
+  buildTeList();
   loadProfile();
   loadApiKeyStatus();
   loadVocab().then(renderVocabList);
@@ -639,6 +931,7 @@ function switchScreen(name){
   document.getElementById('nav-'+name).classList.add('active');
   activeScreen = name;
   if(name==='preview') renderPreview();
+  if(name==='template') buildTeList();
 }
 
 // ═══════════════════════════════
@@ -1200,8 +1493,14 @@ function clearAll(silent){
   });
   document.getElementById('transcriptPreview').classList.remove('show');
   document.getElementById('transcriptPreview').textContent='';
+  TEMPLATE.sections.forEach(s=>{
+    const b=document.getElementById('ibody-'+s.id);
+    if(b) b.textContent='';
+    syncInlineSectionStatus(s.id);
+  });
   currentNoteId=null;
-  updateProgress();checkNoteEmpty();syncQuickList();
+  updateProgress();checkNoteEmpty();
+  if(typeof syncQuickList==='function') syncQuickList();
   if(!silent) showToast('Cleared');
 }
 function newPatient(){
@@ -1285,6 +1584,435 @@ function renderVocabList(){
   if(!custom.length){list.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,.30);padding:8px 0;">No custom terms yet</div>';return;}
   list.innerHTML=custom.map(([k,v])=>`<div class="vocab-item"><span class="vocab-word">${v}</span><button class="vocab-del" onclick="deleteVocab('${k}')">✕</button></div>`).join('');
 }
+
+
+// ═══════════════════════════════════════
+// TEMPLATE EDITOR
+// ═══════════════════════════════════════
+const DEFAULT_SECTIONS = [
+  {id:'cc',     title:'Chief Complaint',            hint:'Presenting complaint and onset...'},
+  {id:'hpi',    title:'History of Present Illness', hint:'Duration, progression, risk factors...'},
+  {id:'pmh',    title:'Past Medical / Surgical Hx', hint:'Hypertension, DM, prior strokes...'},
+  {id:'allergy',title:'Allergies',                  hint:'Drug allergies, contrast, NKDA...'},
+  {id:'meds',   title:'Current Medications',        hint:'Name, dose, frequency...'},
+  {id:'exam',   title:'Neurological Examination',   hint:'GCS, cranial nerves, motor, NIHSS...'},
+  {id:'inv',    title:'Investigations',             hint:'MRI, CT angio, bloods, INR...'},
+  {id:'imp',    title:'Impression / Diagnosis',     hint:'Final diagnosis...'},
+  {id:'rx',     title:'Prescription',               hint:'Medications on numbered lines...'},
+  {id:'plan',   title:'Management Plan',            hint:'Advice, procedures, follow-up, referral...'},
+];
+
+function loadCustomSections(){
+  try{
+    const raw = localStorage.getItem('woyz_custom_template');
+    if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)&&p.length) return p; }
+  }catch(e){}
+  return DEFAULT_SECTIONS.map(s=>({...s,enabled:true}));
+}
+
+function saveCustomSections(secs){
+  try{ localStorage.setItem('woyz_custom_template', JSON.stringify(secs)); }catch(e){}
+}
+
+function getEnabledSections(){
+  return loadCustomSections().filter(s=>s.enabled!==false);
+}
+
+// Rebuild TEMPLATE.sections from custom config and refresh UI
+function applyCustomTemplate(){
+  const secs = loadCustomSections();
+  TEMPLATE.sections = secs.filter(s=>s.enabled!==false);
+  TEMPLATE.sections.forEach(s=>{ if(noteData[s.id]===undefined) noteData[s.id]=''; });
+  buildInlineSections();
+  buildSections();
+  if(typeof buildQuickList === 'function') buildQuickList();
+  updateProgress();
+  checkNoteEmpty();
+}
+
+// Build the editor card list
+function buildTeList(){
+  const secs = loadCustomSections();
+  const list = document.getElementById('teList');
+  if(!list) return;
+  list.innerHTML = '';
+  secs.forEach((sec, i)=>{
+    const card = document.createElement('div');
+    card.className = 'te-card' + (sec.enabled===false ? ' te-disabled' : '');
+    card.id = 'te-' + sec.id;
+    card.draggable = true;
+    card.dataset.id = sec.id;
+    card.innerHTML =
+      `<div class="te-row">
+        <div class="te-drag">⠿</div>
+        <div class="te-num">${i+1}</div>
+        <input class="te-name"
+          value="${sec.title.replace(/"/g,'&quot;')}"
+          placeholder="Section name"
+          ${sec.enabled===false?'disabled':''}
+          onchange="teRename('${sec.id}',this.value)">
+        <div class="te-actions">
+          <button class="te-toggle ${sec.enabled!==false?'on':''}"
+            onclick="teToggle('${sec.id}')"></button>
+          <button class="te-del" onclick="teDel('${sec.id}')">✕</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+  teInitDrag();
+}
+
+function teRename(id, val){
+  if(!val.trim()) return;
+  const secs = loadCustomSections();
+  const s = secs.find(x=>x.id===id);
+  if(!s) return;
+  s.title = val.trim();
+  saveCustomSections(secs);
+  applyCustomTemplate();
+  showToast('Renamed ✓');
+}
+
+function teToggle(id){
+  const secs = loadCustomSections();
+  const s = secs.find(x=>x.id===id);
+  if(!s) return;
+  s.enabled = s.enabled===false ? true : false;
+  saveCustomSections(secs);
+  buildTeList();
+  applyCustomTemplate();
+  showToast(s.enabled ? s.title+' shown' : 'Section hidden');
+}
+
+function teDel(id){
+  const secs = loadCustomSections();
+  const s = secs.find(x=>x.id===id);
+  if(!s || !confirm('Delete "'+s.title+'"? This cannot be undone.')) return;
+  saveCustomSections(secs.filter(x=>x.id!==id));
+  buildTeList();
+  applyCustomTemplate();
+  showToast('Section deleted');
+}
+
+function teShowAdd(){
+  document.getElementById('teAddForm').classList.add('show');
+  setTimeout(()=>document.getElementById('teAddInput').focus(), 50);
+}
+function teHideAdd(){
+  document.getElementById('teAddForm').classList.remove('show');
+  document.getElementById('teAddInput').value='';
+}
+function teConfirmAdd(){
+  const val = document.getElementById('teAddInput').value.trim();
+  if(!val){ showToast('Enter a section name'); return; }
+  const secs = loadCustomSections();
+  const id = 'custom_' + Date.now();
+  secs.push({id, title:val, hint:'Tap to dictate...', enabled:true});
+  saveCustomSections(secs);
+  teHideAdd();
+  buildTeList();
+  applyCustomTemplate();
+  showToast('"'+val+'" added ✓');
+}
+function teReset(){
+  if(!confirm('Reset to default template? All customisations will be lost.')) return;
+  localStorage.removeItem('woyz_custom_template');
+  buildTeList();
+  applyCustomTemplate();
+  showToast('Template reset to default');
+}
+
+// ── Drag & Drop reorder ──
+let teDragSrc = null;
+function teInitDrag(){
+  document.querySelectorAll('.te-card').forEach(card=>{
+    // Mouse drag
+    card.addEventListener('dragstart', e=>{
+      teDragSrc = card;
+      card.classList.add('te-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', ()=>{
+      card.classList.remove('te-dragging');
+      document.querySelectorAll('.te-card').forEach(c=>c.classList.remove('te-drag-over'));
+    });
+    card.addEventListener('dragover', e=>{
+      e.preventDefault();
+      if(card !== teDragSrc){
+        document.querySelectorAll('.te-card').forEach(c=>c.classList.remove('te-drag-over'));
+        card.classList.add('te-drag-over');
+      }
+    });
+    card.addEventListener('drop', e=>{
+      e.preventDefault();
+      card.classList.remove('te-drag-over');
+      if(!teDragSrc || card===teDragSrc) return;
+      const ids = Array.from(document.querySelectorAll('.te-card')).map(c=>c.dataset.id);
+      const from = ids.indexOf(teDragSrc.dataset.id);
+      const to = ids.indexOf(card.dataset.id);
+      const secs = loadCustomSections();
+      const moved = secs.splice(from,1)[0];
+      secs.splice(to,0,moved);
+      saveCustomSections(secs);
+      buildTeList();
+      applyCustomTemplate();
+    });
+
+    // Touch drag
+    const handle = card.querySelector('.te-drag');
+    if(!handle) return;
+    let touchStartY=0, touchClone=null, touchCard=card;
+    handle.addEventListener('touchstart', e=>{
+      touchStartY = e.touches[0].clientY;
+      touchClone = card.cloneNode(true);
+      touchClone.style.cssText = 'position:fixed;width:'+card.offsetWidth+'px;opacity:.80;pointer-events:none;z-index:999;border-radius:12px;background:white;box-shadow:0 8px 24px rgba(0,0,0,.18);top:'+card.getBoundingClientRect().top+'px;left:'+card.getBoundingClientRect().left+'px;';
+      document.body.appendChild(touchClone);
+      card.style.opacity='.30';
+    },{passive:true});
+    handle.addEventListener('touchmove', e=>{
+      e.preventDefault();
+      const dy = e.touches[0].clientY - touchStartY;
+      if(touchClone) touchClone.style.top = (card.getBoundingClientRect().top+dy)+'px';
+      document.querySelectorAll('.te-card').forEach(c=>c.classList.remove('te-drag-over'));
+      const els = Array.from(document.querySelectorAll('.te-card')).filter(c=>c!==touchCard);
+      for(const el of els){
+        const r=el.getBoundingClientRect();
+        if(e.touches[0].clientY>r.top && e.touches[0].clientY<r.bottom){ el.classList.add('te-drag-over'); break; }
+      }
+    },{passive:false});
+    handle.addEventListener('touchend', e=>{
+      if(touchClone){touchClone.remove(); touchClone=null;}
+      card.style.opacity='';
+      const target = document.querySelector('.te-card.te-drag-over');
+      document.querySelectorAll('.te-card').forEach(c=>c.classList.remove('te-drag-over'));
+      if(target && target!==touchCard){
+        const ids = Array.from(document.querySelectorAll('.te-card')).map(c=>c.dataset.id);
+        const from = ids.indexOf(touchCard.dataset.id);
+        const to = ids.indexOf(target.dataset.id);
+        const secs = loadCustomSections();
+        const moved = secs.splice(from,1)[0];
+        secs.splice(to,0,moved);
+        saveCustomSections(secs);
+        buildTeList();
+        applyCustomTemplate();
+      }
+    },{passive:true});
+  });
+}
+
+
+// ═══════════════════════════════════════
+// INLINE SECTIONS — build editable cards on dictate screen
+// ═══════════════════════════════════════
+let activeSectionRec = null; // which section is currently recording
+
+function buildInlineSections(){
+  const container = document.getElementById('inlineSections');
+  if(!container) return;
+  container.innerHTML = '';
+  TEMPLATE.sections.forEach((sec, i) => {
+    const card = document.createElement('div');
+    card.className = 'isec-card';
+    card.id = 'isec-' + sec.id;
+    card.innerHTML =
+      '<div class="isec-head">' +
+        '<div class="isec-num" id="inum-'+sec.id+'">'+(i+1)+'</div>' +
+        '<div class="isec-title" id="itit-'+sec.id+'">'+sec.title+'</div>' +
+        '<div class="isec-rec" id="irec-'+sec.id+'"><div class="isec-rec-dot"></div>REC</div>' +
+        '<div class="isec-check" id="ichk-'+sec.id+'"></div>' +
+        '<button class="isec-mic" id="imic-'+sec.id+'" onclick="tapInlineMic(''+sec.id+'')" title="Dictate this section">🎤</button>' +
+      '</div>' +
+      '<div class="isec-body" id="ibody-'+sec.id+'" contenteditable="true" ' +
+        'data-ph="'+sec.hint+'" ' +
+        'oninput="onInlineEdit(''+sec.id+'')"></div>';
+    container.appendChild(card);
+    // restore any existing data
+    if(noteData[sec.id]){
+      const body = card.querySelector('.isec-body');
+      if(body) body.textContent = noteData[sec.id];
+      syncInlineSectionStatus(sec.id);
+    }
+  });
+}
+
+function onInlineEdit(id){
+  const body = document.getElementById('ibody-'+id);
+  if(body) noteData[id] = body.textContent.trim();
+  syncInlineSectionStatus(id);
+  updateProgress();
+  checkNoteEmpty();
+  // keep old ql sync working
+  if(typeof syncQuickList === 'function') syncQuickList();
+}
+
+function syncInlineSectionStatus(id){
+  const filled = !!(noteData[id] && noteData[id].trim());
+  const card = document.getElementById('isec-'+id);
+  const chk = document.getElementById('ichk-'+id);
+  if(card){
+    card.classList.toggle('isec-filled', filled && activeSectionRec !== id);
+    card.classList.toggle('isec-active', activeSectionRec === id);
+  }
+  if(chk) chk.textContent = filled ? '✓' : '';
+}
+
+function syncAllInlineSections(){
+  TEMPLATE.sections.forEach(s => syncInlineSectionStatus(s.id));
+  updateProgress();
+  checkNoteEmpty();
+}
+
+// Tap the mic icon on an inline section
+function tapInlineMic(id){
+  if(singleRecording){ showToast('Stop full dictation first'); return; }
+  if(activeSectionRec === id){
+    // Stop recording this section
+    if(window._isecRecorder && window._isecRecorder.state !== 'inactive'){
+      window._isecRecorder.stop();
+    } else {
+      stopInlineSectionDictation(id);
+    }
+    return;
+  }
+  // Stop any currently recording section
+  if(activeSectionRec) stopInlineSectionDictation(activeSectionRec);
+  startInlineSectionDictation(id);
+}
+
+async function startInlineSectionDictation(id){
+  if(!getApiKey()){ showToast('Add API key in Training tab first'); return; }
+  activeSectionRec = id;
+  syncInlineSectionStatus(id);
+  document.getElementById('irec-'+id)?.classList.add('show');
+  document.getElementById('ibody-'+id)?.classList.add('isec-dictating');
+  document.getElementById('imic-'+id).textContent = '⏹';
+
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+    let chunks = [];
+    const mt = getSupportedMimeType();
+    let mr;
+    try{ mr = mt ? new MediaRecorder(stream,{mimeType:mt}) : new MediaRecorder(stream); }
+    catch(e){ mr = new MediaRecorder(stream); }
+    window._isecRecorder = mr;
+
+    mr.ondataavailable = e => { if(e.data && e.data.size>0) chunks.push(e.data); };
+    mr.onstop = async () => {
+      stream.getTracks().forEach(t=>t.stop());
+      window._isecRecorder = null;
+      stopInlineSectionDictation(id);
+      if(!chunks.length) return;
+      // Transcribe
+      try{
+        const sec = TEMPLATE.sections.find(s=>s.id===id);
+        const mimeType = mr.mimeType || 'audio/mp4';
+        const ext = mimeType.includes('mp4')?'mp4':mimeType.includes('ogg')?'ogg':'webm';
+        const blob = new Blob(chunks, {type:mimeType});
+        const fd = new FormData();
+        fd.append('file', blob, 'sec.'+ext);
+        fd.append('model', 'whisper-1');
+        fd.append('language', 'en');
+        const vocab = Object.values(corrections).slice(0,60).join(', ');
+        if(vocab) fd.append('prompt', vocab);
+        const res = await fetch('https://api.openai.com/v1/audio/transcriptions',{
+          method:'POST', headers:{'Authorization':'Bearer '+getApiKey()}, body:fd
+        });
+        if(res.status===401){ showToast('Invalid API key'); return; }
+        if(!res.ok) throw new Error('Error '+res.status);
+        const data = await res.json();
+        const transcript = (data.text||'').trim();
+        if(!transcript){ showToast('No speech detected'); return; }
+        const body = document.getElementById('ibody-'+id);
+        if(body){
+          const existing = body.textContent.trim();
+          const merged = existing ? existing+' '+transcript : transcript;
+          body.textContent = merged;
+          noteData[id] = merged;
+          body.classList.add('just-filled');
+          setTimeout(()=>body.classList.remove('just-filled'), 600);
+        }
+        syncInlineSectionStatus(id);
+        updateProgress();
+        checkNoteEmpty();
+        showToast((sec?.title||id)+' done ✓');
+      }catch(err){ showToast('Error: '+err.message); }
+    };
+    mr.onerror = () => { showToast('Recording error'); stopInlineSectionDictation(id); };
+    mr.start(500);
+  }catch(err){
+    if(err.name==='NotAllowedError') showToast('Microphone blocked — check settings');
+    else showToast('Mic error: '+err.message);
+    stopInlineSectionDictation(id);
+  }
+}
+
+function stopInlineSectionDictation(id){
+  activeSectionRec = null;
+  document.getElementById('irec-'+id)?.classList.remove('show');
+  document.getElementById('ibody-'+id)?.classList.remove('isec-dictating');
+  const mic = document.getElementById('imic-'+id);
+  if(mic) mic.textContent = '🎤';
+  syncInlineSectionStatus(id);
+}
+
+// After full dictation fills sections — update inline cards
+function fillInlineFromNoteData(){
+  TEMPLATE.sections.forEach(s=>{
+    const body = document.getElementById('ibody-'+s.id);
+    if(body && noteData[s.id]){
+      body.textContent = noteData[s.id];
+      body.classList.add('just-filled');
+      setTimeout(()=>body.classList.remove('just-filled'), 600);
+    }
+    syncInlineSectionStatus(s.id);
+  });
+  updateProgress();
+  checkNoteEmpty();
+}
+
+// ═══════════════════════════════════════
+// iOS-STYLE AGE/SEX PICKER
+// ═══════════════════════════════════════
+let pickerAge = 45;
+let pickerSex = 'M';
+const SEX_OPTIONS = ['M', 'F', 'Other'];
+
+function buildDrums(){
+  const ageEl = document.getElementById('drumAge');
+  if(ageEl.children.length) return; // already built
+  for(let a=1;a<=120;a++){
+    const d = document.createElement('div');
+    d.className = 'drum-item';
+    d.textContent = a + ' yrs';
+    ageEl.appendChild(d);
+  }
+  const sexEl = document.getElementById('drumSex');
+  SEX_OPTIONS.forEach(s=>{
+    const d = document.createElement('div');
+    d.className = 'drum-item';
+    d.textContent = s;
+    sexEl.appendChild(d);
+  });
+}
+
+function openAgeSexPicker(){
+  document.getElementById('pickerModal').classList.add('show');
+  buildDrums();
+  requestAnimationFrame(()=>{
+    document.getElementById('drumAge').scrollTop = (pickerAge-1)*44;
+    document.getElementById('drumSex').scrollTop = SEX_OPTIONS.indexOf(pickerSex)*44;
+  });
+}
+function closePicker(){
+  document.getElementById('pickerModal').classList.remove('show');
+}
+function donePicker(){
+  pickerAge = Math.max(1, Math.min(120, Math.round(document.getElementById('drumAge').scrollTop/44)+1));
+  pickerSex = SEX_OPTIONS[Math.max(0,Math.min(SEX_OPTIONS.length-1,Math.round(document.getElementById('drumSex').scrollTop/44)))];
+  document.getElementById('ageSexText').textContent = pickerAge+' / '+pickerSex;
+  closePicker();
+}
+function getAgeSex(){ return pickerAge+' '+pickerSex; }
 
 // ═══════════════════════════════
 // TOAST
