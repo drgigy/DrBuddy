@@ -1258,8 +1258,14 @@ Do not invent information not present in the dictation.`},
       updateProgress();checkNoteEmpty();
       fillInlineFromNoteData();
     },TEMPLATE.sections.length*80+100);
-    if(filled===0) showToast('AI found no matching sections — check transcript');
-    else showToast(filled+' section'+(filled===1?'':'s')+' filled ✓ — review below');
+    if(filled===0){
+      showToast('AI found no matching sections — check transcript');
+    } else {
+      showToast(filled+' section'+(filled===1?'':'s')+' filled ✓');
+      // Hide raw transcript — structured sections are shown below
+      const tp=document.getElementById('transcriptPreview');
+      if(tp){tp.textContent='';tp.classList.remove('show');}
+    }
     switchScreen('dictate');
   }catch(err){
     console.error('processFullDictation error:',err);
@@ -1466,8 +1472,8 @@ function clearAll(silent){
     if(nb) nb.textContent='';
     updateSectionStatus(s.id);
   });
-  document.getElementById('transcriptPreview').classList.remove('show');
-  document.getElementById('transcriptPreview').textContent='';
+  const _tp=document.getElementById('transcriptPreview');
+  if(_tp){_tp.classList.remove('show');_tp.textContent='';}
   TEMPLATE.sections.forEach(s=>{
     const b=document.getElementById('ibody-'+s.id);
     if(b) b.textContent='';
