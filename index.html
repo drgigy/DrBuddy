@@ -460,19 +460,20 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 
 .dictate-action-bar{
   flex-shrink:0;
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;
-  padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
   background:white;border-top:1.5px solid var(--border);
   box-shadow:0 -2px 8px rgba(0,0,0,.06);
 }
 .dab-btn{
   height:44px;border-radius:11px;border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:600;
   transition:all .15s;-webkit-tap-highlight-color:transparent;
 }
 .dab-btn:active{transform:scale(.96);}
-.dab-save{background:var(--blue);color:white;}
+.dab-print{background:var(--surface);color:var(--ink2);border:1.5px solid var(--border);}
+.dab-copy{background:var(--surface);color:var(--ink2);border:1.5px solid var(--border);}
 .dab-clear{background:#fef2f2;color:#b91c1c;border:1.5px solid #fca5a5;}
 .dab-wa{background:#25d366;color:white;}
 
@@ -689,7 +690,8 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Sans',sans-serif;bac
 
   <!-- FIXED BOTTOM: action bar -->
   <div class="dictate-action-bar">
-    <button class="dab-btn dab-save" onclick="saveNote()">💾 Save</button>
+    <button class="dab-btn dab-print" onclick="printNote()">🖶 Print</button>
+    <button class="dab-btn dab-copy" onclick="copyNote()">📋 Copy</button>
     <button class="dab-btn dab-clear" onclick="clearAll()">🗑 Clear</button>
     <button class="dab-btn dab-wa" onclick="waNote()">💬 WA</button>
   </div>
@@ -1465,7 +1467,13 @@ async function saveNote(){
   showToast('Note saved ✓');
 }
 function clearAll(silent){
-  if(!silent&&!confirm('Clear all content?')) return;
+  if(!silent&&!confirm('Clear all content and patient details?')) return;
+  // Clear patient fields
+  const pn=document.getElementById('patName'); if(pn) pn.value='';
+  const pm=document.getElementById('patMrd'); if(pm) pm.value='';
+  pickerAge=45; pickerSex='M';
+  const at=document.getElementById('ageSexText'); if(at) at.textContent='Select';
+  updateHeader();
   TEMPLATE.sections.forEach(s=>{
     noteData[s.id]='';
     const nb=document.getElementById('nb-'+s.id);
